@@ -1,0 +1,33 @@
+import { createSupabaseServerClient } from '@/app/lib/supabase/server';
+
+export async function PATCH(request: Request) {
+  const { hash, activation_code, updatedData } = await request.json();
+
+  const supabase = await createSupabaseServerClient();
+
+  // 1. Validação Manual: O código de ativação confere com o hash da URL?
+  const { data: tag, error } = await supabase
+    .from('tags')
+    .select('id')
+    .eq('hash_url', hash)
+    .eq('activation_code', activation_code)
+    .single();
+
+  if (error || !tag) {
+    return Response.json({ error: "Acesso negado: Código de ativação incorreto." }, { status: 401 });
+  }
+
+  // 2. Se validou, executa a atualização
+  const { error: updateError } = await supabase
+    .from('tag_data')
+    .update({ 
+      full_name: updatedData.name, 
+      phone: updatedData.phone, 
+      observations: updatedData.obs 
+    })
+    .eq('tag_id', tag.id);
+
+  if (updateError) return Response.json({ error: "Erro ao salvar" }, { status: 500 });
+
+  return Response.json({ success: true });
+}
