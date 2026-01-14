@@ -1,18 +1,36 @@
-import { Metadata } from 'next';
+import { GetServerSidePropsContext, Metadata } from 'next';
+import { headers } from 'next/headers';
 import { notFound } from 'next/navigation';
 
 interface ViewerProps {
+  siteUrl: string;
   params: { hash: string };
 }
 
-// Opcional: Gera títulos dinâmicos para a página
-export async function generateMetadata({ params }: ViewerProps): Promise<Metadata> {
-  return { title: `Informações da Tag - ${params.hash}` };
+const getData = async () => {
+  const headersMap = await headers();
+
+  const host = headersMap.get('host');
+  const protocol = 'http';
+  const siteUrl = `${protocol}://${host}`;
+
+  return {
+    siteUrl,
+  };
+};
+
+export const generateMetadata = async ({ params }: ViewerProps): Promise<Metadata> =>{
+  const { hash } = await params;
+  return { title: `Informações da Tag - ${hash}` };
 }
 
+
 export default async function ViewerPage({ params }: ViewerProps) {
+  const { hash } = await params;
+  const { siteUrl } = await getData();
+
   // Chamada direta ao banco no Server Component (Padrão Next.js 14+)
-  const response = await fetch(`${process.env.NEXT_PUBLIC_SITE_URL}/api/view/${params.hash}`, {
+  const response = await fetch(`${siteUrl}/api/v1/view/${hash}`, {
     cache: 'no-store' // Garante que as informações estejam sempre atualizadas
   });
 
@@ -25,7 +43,9 @@ export default async function ViewerPage({ params }: ViewerProps) {
     );
   }
 
-  const data = await response.json();
+  const [data] = await response.json();
+
+  console.log("Viewer Page Data:", data);
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col items-center p-6">
@@ -78,7 +98,7 @@ export default async function ViewerPage({ params }: ViewerProps) {
 
       {/* Botão de WhatsApp (Opcional) */}
       <a 
-        href={`https://wa.me/${data.phone.replace(/\D/g, '')}`} 
+        href={`https://wa.me/${data.phone?.replace(/\D/g, '')}`} 
         target="_blank" 
         className="mt-6 flex items-center gap-2 text-green-600 font-semibold text-sm bg-white px-6 py-3 rounded-full shadow-sm border border-green-100"
       >

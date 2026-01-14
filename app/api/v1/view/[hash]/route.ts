@@ -1,8 +1,7 @@
-import { createSupabaseServerClient } from "@/app/lib/supabase/server";
+import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 export async function GET(req: Request, { params }: { params: { hash: string } }) {
-  console.log("API View Tag Called", params.hash);
-  const { hash } = params;
+  const { hash } = await params;
 
   const supabase = await createSupabaseServerClient();
 
@@ -19,6 +18,8 @@ export async function GET(req: Request, { params }: { params: { hash: string } }
   if (data.status === 'pending') {
     return Response.json({ error: "Tag ainda não foi ativada pelo proprietário" }, { status: 403 });
   }
+
+  console.log(data.tag_data)
 
   return Response.json(data.tag_data);
 }

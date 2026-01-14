@@ -1,4 +1,4 @@
-import { createSupabaseServerClient } from '@/app/lib/supabase/server';
+import { createSupabaseServerClient } from '@/lib/supabase/server';
 
 export async function PATCH(request: Request) {
   const { hash, activation_code, updatedData } = await request.json();
