@@ -25,17 +25,16 @@ O sistema foi concebido para validar a ideia de identificação dinâmica. Difer
 
 ---
 
-## 📂 Estrutura de Arquivos
+## ⚖️ Licença
+Este projeto está licenciado sob a Apache License 2.0 com a Commons Clause.
 
+#### O que isso significa?
+A Apache License 2.0 é uma licença permissiva, mas a Commons Clause adiciona uma restrição crítica: você não pode vender o software.
 
+- Você pode: Copiar, modificar e usar o código para fins internos ou pessoais.
 
-```text
-src/
- ├── app/
- │    ├── api/v1/tags/    # Endpoints: generate, activate, update, list
- │    ├── admin/          # Gestão de produção e exportação CSV
- │    ├── activate/       # Fluxo de ativação para novos proprietários
- │    ├── manage/[hash]/  # Painel de edição do proprietário
- │    └── view/[hash]/    # Interface de visualização pública
- ├── components/          # Header, LoadingOverlay e UI escalável
- ├── lib/                 # Configuração Supabase e utils (Máscaras/Datas)
+- Você NÃO pode: Vender o software ou cobrar por serviços que consistam principalmente no valor deste software.
+
+O objetivo desta licença é manter o projeto aberto para colaboração e transparência, enquanto protege os criadores de exploração comercial não autorizada da ideia e do sistema.
+
+_Copyright (c) 2026 Meu Info ID._
