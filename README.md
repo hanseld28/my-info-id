@@ -1,36 +1,41 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 🆔 Meu Info ID - NFC Tag Management System
 
-## Getting Started
+O **Meu Info ID** é uma solução completa para gerenciamento de identificação via tecnologia NFC. O projeto permite a criação de tags inteligentes que, ao serem lidas por smartphones, exibem informações críticas de contato e segurança de forma instantânea.
 
-First, run the development server:
+---
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## 🚀 O Projeto
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+O sistema foi concebido para validar a ideia de identificação dinâmica. Diferente de uma etiqueta estática, o My Info ID permite que o proprietário atualize seus dados (nome, telefone, observações médicas ou de segurança) a qualquer momento, sem precisar trocar a tag física.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### 👥 Perfis de Acesso
+- **Viewer (Público):** Visualização rápida dos dados da tag através de um `hash` único na URL.
+- **Owner (Dono):** Ativação de tags novas e edição de dados existentes mediante o uso de um código de segurança de 8 dígitos.
+- **Admin:** Controle de produção, geração de lotes de códigos e exportação de dados para logística.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+---
 
-## Learn More
+## 🛠 Stack Tecnológica
 
-To learn more about Next.js, take a look at the following resources:
+- **Framework:** Next.js 14+ (App Router)
+- **Backend:** Next.js API Routes (v1)
+- **Banco de Dados:** Supabase (PostgreSQL)
+- **Estilização:** Tailwind CSS
+- **Segurança:** Validação de tokens e códigos via Server-side (Bypass RLS para controle total via API)
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+---
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## 📂 Estrutura de Arquivos
 
-## Deploy on Vercel
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```text
+src/
+ ├── app/
+ │    ├── api/v1/tags/    # Endpoints: generate, activate, update, list
+ │    ├── admin/          # Gestão de produção e exportação CSV
+ │    ├── activate/       # Fluxo de ativação para novos proprietários
+ │    ├── manage/[hash]/  # Painel de edição do proprietário
+ │    └── view/[hash]/    # Interface de visualização pública
+ ├── components/          # Header, LoadingOverlay e UI escalável
+ ├── lib/                 # Configuração Supabase e utils (Máscaras/Datas)
