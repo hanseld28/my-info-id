@@ -19,7 +19,5 @@ export async function GET(req: Request, { params }: { params: { hash: string } }
     return Response.json({ error: "Tag ainda não foi ativada pelo proprietário" }, { status: 403 });
   }
 
-  console.log(data.tag_data)
-
   return Response.json(data.tag_data);
 }

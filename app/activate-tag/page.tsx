@@ -1,11 +1,18 @@
 'use client';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { maskPhone } from '@/lib/utils/general-utils';
+import LoadingOverlay from '@/components/LoadingOverlay';
 
 export default function ActivatePage() {
-  const [loading, setLoading] = useState(false);
-  const [form, setForm] = useState({ code: '', name: '', phone: '', obs: '' });
   const router = useRouter();
+  const [form, setForm] = useState({ code: '', name: '', phone: '', obs: '' });
+  const [loading, setLoading] = useState(false);
+
+  const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const masked = maskPhone(e.target.value);
+    setForm({ ...form, phone: masked });
+  };
 
   const handleActivate = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -17,8 +24,9 @@ export default function ActivatePage() {
     });
 
     if (res.ok) {
+      const activatedTag = await res.json();
       alert("Tag ativada com sucesso!");
-      router.push('/'); // Redireciona para home ou para a view da tag
+      router.push(`/view-tag/${activatedTag.data.hash_url}`);
     } else {
       const err = await res.json();
       alert(err.error);
@@ -28,6 +36,7 @@ export default function ActivatePage() {
 
   return (
     <main className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+      {loading && <LoadingOverlay message="Ativando sua Tag..." />}
       <div className="max-w-md w-full bg-white rounded-xl shadow-lg p-8">
         <h1 className="text-2xl font-bold text-gray-800 mb-2">Ativar Nova Tag</h1>
         <p className="text-gray-500 mb-6 text-sm">Insira o código de 8 dígitos impresso na sua embalagem.</p>
@@ -48,10 +57,11 @@ export default function ActivatePage() {
           <input
             required
             type="tel"
-            placeholder="Telefone com DDD"
-            className="w-full p-3 border rounded-lg"
-            onChange={e => setForm({...form, phone: e.target.value})}
-          />
+            placeholder="(99) 99999-9999"
+            className="w-full p-3 border rounded-lg outline-none focus:ring-2 focus:ring-blue-500"
+            value={form.phone}
+            onChange={handlePhoneChange}
+          /> 
           <textarea
             placeholder="Observações importantes (médicas, avisos, etc)"
             className="w-full p-3 border rounded-lg h-32"

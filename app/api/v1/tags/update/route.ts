@@ -1,7 +1,7 @@
 import { createSupabaseServerClient } from '@/lib/supabase/server';
 
 export async function PATCH(request: Request) {
-  const { hash, activation_code, updatedData } = await request.json();
+  const { hash, security_code, updatedData } = await request.json();
 
   const supabase = await createSupabaseServerClient();
 
@@ -10,7 +10,7 @@ export async function PATCH(request: Request) {
     .from('tags')
     .select('id')
     .eq('hash_url', hash)
-    .eq('activation_code', activation_code)
+    .eq('security_code', security_code)
     .single();
 
   if (error || !tag) {

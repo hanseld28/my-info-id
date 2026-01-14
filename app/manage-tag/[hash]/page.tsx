@@ -16,7 +16,7 @@ export default function ManagePage() {
       method: 'PATCH',
       body: JSON.stringify({
         hash: params.hash,
-        activation_code: code.toUpperCase(),
+        security_code: code.toUpperCase(),
         updatedData: { name: data.name, phone: data.phone, observations: data.obs }
       }),
     });

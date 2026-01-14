@@ -9,7 +9,7 @@ export async function POST(request: Request) {
   const { data: tag, error } = await supabase
     .from('tags')
     .select('id')
-    .eq('activation_code', code)
+    .eq('security_code', code)
     .eq('status', 'pending')
     .single();
 
@@ -22,9 +22,19 @@ export async function POST(request: Request) {
     .from('tag_data')
     .insert({ tag_id: tag.id, full_name: name, phone: phone, observations: obs });
 
-  if (!insertError) {
-    await supabase.from('tags').update({ status: 'active' }).eq('id', tag.id);
+  if (insertError) {
+    return Response.json({ error: "Erro ao salvar os dados da tag" }, { status: 500 });
   }
 
-  return Response.json({ success: true });
+  const { data: activatedTag, error: activatedTagError } = await supabase.from('tags')
+    .update({ status: 'active' })
+    .eq('id', tag.id)
+    .select()
+    .single();
+
+  if (activatedTagError) {
+    return Response.json({ error: "Erro ao ativar a tag" }, { status: 500 });
+  }
+
+  return Response.json({ success: true, data: activatedTag });
 }

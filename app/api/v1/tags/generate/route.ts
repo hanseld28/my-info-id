@@ -1,6 +1,6 @@
 // src/app/api/admin/generate-tags/route.ts
 import { createClient } from '@supabase/supabase-js';
-import { generateHash, generateActivationCode } from '@/lib/utils/generator-utils';
+import { generateHash, generateSecurityCode } from '@/lib/utils/generator-utils';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
 
 export async function POST(req: Request) {
@@ -13,7 +13,7 @@ export async function POST(req: Request) {
     for (let i = 0; i < quantity; i++) {
       newTags.push({
         hash_url: generateHash(),
-        activation_code: generateActivationCode(),
+        security_code: generateSecurityCode(),
         status: 'pending'
       });
     }
