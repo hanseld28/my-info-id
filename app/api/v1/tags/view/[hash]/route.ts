@@ -1,6 +1,6 @@
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
-export async function GET(req: Request, { params }: { params: { hash: string } }) {
+export async function GET(req: Request, { params }: { params: Promise<{ hash: string }> }) {
   const { hash } = await params;
 
   const supabase = await createSupabaseServerClient();
