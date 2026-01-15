@@ -3,8 +3,9 @@ import { useState, useEffect } from 'react';
 import LoadingOverlay from '@/components/LoadingOverlay';
 import { formatDateTime } from '@/lib/utils/date-utils';
 import Link from 'next/link';
+import TagQRCode from '@/components/TagQRCode';
 
-export default function AdminPage() {
+export default function BackofficePanelPage() {
   const [quantity, setQuantity] = useState(1);
   const [allTags, setAllTags] = useState<any[]>([]);
   const [filter, setFilter] = useState('all');
@@ -128,6 +129,7 @@ export default function AdminPage() {
           <table className="min-w-full divide-y divide-slate-200">
             <thead className="bg-slate-50">
               <tr>
+                <th className="px-6 py-4 text-left text-[10px] font-bold text-slate-400 uppercase tracking-widest">QR Code</th>
                 <th className="px-6 py-4 text-left text-[10px] font-bold text-slate-400 uppercase tracking-widest">Acesso Público (URL)</th>
                 <th className="px-6 py-4 text-left text-[10px] font-bold text-slate-400 uppercase tracking-widest">Código Ativação</th>
                 <th className="px-6 py-4 text-left text-[10px] font-bold text-slate-400 uppercase tracking-widest">Data</th>
@@ -137,6 +139,9 @@ export default function AdminPage() {
             <tbody className="divide-y divide-slate-200">
               {allTags.map((tag) => (
                 <tr key={tag.id} className="hover:bg-slate-50 transition-colors group">
+                  <td className="px-6 py-4">
+                    <TagQRCode hash={tag.hash_url} id={tag.id} />
+                  </td>
                   <td className="px-6 py-4">
                     <Link
                       href={`/view-tag/${tag.hash_url}`} 
