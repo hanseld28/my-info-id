@@ -17,9 +17,9 @@ export default function NotFound() {
           <Link href="/" className="block w-full bg-gray-200 text-gray-800 py-3 rounded-lg font-semibold hover:bg-gray-300 transition-colors">
               Voltar para o Início
           </Link>
-          <Link href="/contact" className="block w-full text-blue-600 border border-blue-600 py-3 rounded-lg font-semibold hover:bg-blue-50 transition-colors">
+          {/* <Link href="/contact" className="block w-full text-blue-600 border border-blue-600 py-3 rounded-lg font-semibold hover:bg-blue-50 transition-colors">
               Precisa de Ajuda? Contate-nos
-          </Link>
+          </Link> */}
         </div>
       </div>
     </div>

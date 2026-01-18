@@ -31,16 +31,8 @@ export default async function Header() {
             Ativar Tag
           </Link>
 
-          {user ? (
-            <LogoutButton />
-          ) : (
-            <Link 
-              href="/login" 
-              className="text-xs font-semibold bg-slate-100 text-slate-500 px-3 py-1.5 rounded uppercase tracking-wider hover:bg-slate-200"
-            >
-              Entrar
-            </Link>
-          )}
+          {user ? (<LogoutButton />) : (<></>)}
+          
         </nav>
       </div>
     </header>

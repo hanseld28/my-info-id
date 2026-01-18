@@ -4,6 +4,7 @@ import LoadingOverlay from '@/components/LoadingOverlay';
 import { formatDateTime } from '@/lib/utils/date-utils';
 import Link from 'next/link';
 import TagQRCode from '@/components/TagQRCode';
+import { TARGET_TYPE_LABELS } from '@/lib/utils/constants';
 
 export default function BackofficePanelPage() {
   const [quantity, setQuantity] = useState(1);
@@ -130,6 +131,7 @@ export default function BackofficePanelPage() {
             <thead className="bg-slate-50">
               <tr>
                 <th className="px-6 py-4 text-left text-[10px] font-bold text-slate-400 uppercase tracking-widest">QR Code</th>
+                <th className="px-6 py-4 text-left text-[10px] font-bold text-slate-400 uppercase tracking-widest">Tipo de Tag</th>
                 <th className="px-6 py-4 text-left text-[10px] font-bold text-slate-400 uppercase tracking-widest">Acesso Público (URL)</th>
                 <th className="px-6 py-4 text-left text-[10px] font-bold text-slate-400 uppercase tracking-widest">Código Ativação</th>
                 <th className="px-6 py-4 text-left text-[10px] font-bold text-slate-400 uppercase tracking-widest">Data</th>
@@ -141,6 +143,11 @@ export default function BackofficePanelPage() {
                 <tr key={tag.id} className="hover:bg-slate-50 transition-colors group">
                   <td className="px-6 py-4">
                     <TagQRCode hash={tag.hash_url} id={tag.id} />
+                  </td>
+                  <td className="px-6 py-4">
+                    <span className="text-xs font-medium text-slate-600 bg-slate-100 px-2 py-1 rounded-full">
+                      {TARGET_TYPE_LABELS[tag.target_type] || 'Não definido'}
+                    </span>
                   </td>
                   <td className="px-6 py-4">
                     <Link

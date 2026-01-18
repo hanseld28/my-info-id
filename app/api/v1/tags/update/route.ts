@@ -5,7 +5,6 @@ export async function PATCH(request: Request) {
 
   const supabase = await createSupabaseServerClient();
 
-  // 1. Validação Manual: O código de ativação confere com o hash da URL?
   const { data: tag, error } = await supabase
     .from('tags')
     .select('id')
@@ -17,17 +16,16 @@ export async function PATCH(request: Request) {
     return Response.json({ error: "Acesso negado: Código de ativação incorreto." }, { status: 401 });
   }
 
-  // 2. Se validou, executa a atualização
   const { error: updateError } = await supabase
     .from('tag_data')
     .update({ 
-      full_name: updatedData.name, 
-      phone: updatedData.phone, 
-      observations: updatedData.obs 
+      ...updatedData
     })
     .eq('tag_id', tag.id);
-
-  if (updateError) return Response.json({ error: "Erro ao salvar" }, { status: 500 });
+  
+  if (updateError) {
+    return Response.json({ error: "Erro ao salvar" }, { status: 500 });
+  }
 
   return Response.json({ success: true });
 }
