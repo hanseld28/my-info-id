@@ -3,7 +3,7 @@ import { headers } from 'next/headers';
 import { notFound } from 'next/navigation';
 import { pendingTagActivation } from '@/errors/tag-error-templates';
 import { TARGET_CONFIG } from '@/lib/utils/constants';
-import { MessageCircleMore, PhoneCall, Settings } from 'lucide-react';
+import { AlertOctagon, MessageCircleMore, PhoneCall } from 'lucide-react';
 import ShareLocation from '@/components/ShareLocation';
 import Link from 'next/link';
 
@@ -46,7 +46,8 @@ export default async function ViewerPage({ params }: ViewerProps) {
     return notFound();
   }
 
-  const [data] = await response.json();
+  const { data } = await response.json();
+
   const config = TARGET_CONFIG[data.target_type] || TARGET_CONFIG.other;
   const Icon = config.icon;
   
@@ -54,15 +55,7 @@ export default async function ViewerPage({ params }: ViewerProps) {
 
   return (
     <main className="min-h-screen bg-slate-50 flex flex-col items-center p-6">
-      <div className="max-w-md w-full flex justify-end mb-2">
-        <Link 
-          href={`/manage-tag/${hash}`}
-          className="flex items-center gap-2 text-[10px] font-bold text-slate-400 hover:text-blue-600 transition-colors uppercase tracking-widest bg-white/50 px-3 py-1.5 rounded-lg border border-slate-200 shadow-sm"
-        >
-          <Settings size={12} />
-          Sou o dono / Editar
-        </Link>
-      </div>
+      
       <div className="max-w-md w-full bg-white rounded-3xl shadow-xl overflow-hidden">
         
         <div className={`h-24 w-full ${config.color.split(' ')[0]} flex items-center justify-center`}>
@@ -119,6 +112,16 @@ export default async function ViewerPage({ params }: ViewerProps) {
         phone={data.phone} 
         ownerName={data.full_name} 
       />
+
+      <div className="max-w-md w-full flex justify-center mt-6 mb-2">
+        <Link 
+          href={`/manage-tag/${hash}`}
+          className="flex items-center gap-2 text-[10px] font-bold text-slate-400 hover:text-blue-600 transition-colors uppercase tracking-widest bg-white/50 px-3 py-1.5 rounded-xl border border-slate-200 shadow-sm"
+        >
+          <AlertOctagon size={12} />
+          É o dono desta Tag? Gerencie aqui.
+        </Link>
+      </div>
 
     </main>
 
