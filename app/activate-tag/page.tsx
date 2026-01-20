@@ -93,7 +93,7 @@ export default function ActivatePage() {
 
     if (res.ok) {
       const activatedTag = await res.json();
-      router.push(`/view/${activatedTag.data.hash_url}`);
+      router.push(`/view-tag/${activatedTag.data.hash_url}`);
     } else {
       const err = await res.json();
       alert(err.error);
