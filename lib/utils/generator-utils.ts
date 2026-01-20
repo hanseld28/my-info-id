@@ -1,12 +1,16 @@
-export const generateHash = (length = 6) => {
-  return Math.random().toString(36).substring(2, 2 + length);
-};
+const SECURE_CHARS = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789';
 
-export const generateSecurityCode = () => {
-  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+const generateSecureString = (length: number): string => {
+  const array = new Uint8Array(length);
+  crypto.getRandomValues(array);
+  
   let result = '';
-  for (let i = 0; i < 8; i++) {
-    result += chars.charAt(Math.floor(Math.random() * chars.length));
+  for (let i = 0; i < length; i++) {
+    result += SECURE_CHARS.charAt(array[i] % SECURE_CHARS.length);
   }
   return result;
 };
+
+export const generateHashURL = () => generateSecureString(8).toLowerCase();
+
+export const generateSecurityCode = () => generateSecureString(8);
