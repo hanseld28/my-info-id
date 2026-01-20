@@ -4,9 +4,9 @@ import Link from 'next/link';
 
 export default function HomePage() {
   return (
-    <main className="min-h-screen bg-gradient-to-br from-blue-400 to-indigo-700 text-white selection:bg-white selection:text-blue-700">
+    <main className="min-h-screen bg-linear-to-br from-blue-400 to-indigo-700 text-white selection:bg-white selection:text-blue-700">
       
-      <section id="hero" className="flex flex-col items-center justify-center pt-24 pb-16 px-6 text-center">
+      <section id="hero" className="flex flex-col items-center justify-center pt-10 pb-16 px-6 text-center">
         <header className="max-w-4xl mx-auto">
           <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight leading-tight">
             Informações importantes ao alcance de um toque.

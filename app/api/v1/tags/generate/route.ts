@@ -1,6 +1,4 @@
-// src/app/api/admin/generate-tags/route.ts
-import { createClient } from '@supabase/supabase-js';
-import { generateHash, generateSecurityCode } from '@/lib/utils/generator-utils';
+import { generateHashURL, generateSecurityCode } from '@/lib/utils/generator-utils';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
 
 export async function POST(req: Request) {
@@ -8,14 +6,35 @@ export async function POST(req: Request) {
 
   try {
     const { quantity } = await req.json();
-    const newTags = [];
+    
+    const { data: existingTags } = await supabase
+      .from('tags')
+      .select('hash_url, security_code');
 
-    for (let i = 0; i < quantity; i++) {
-      newTags.push({
-        hash_url: generateHash(),
-        security_code: generateSecurityCode(),
-        status: 'pending'
-      });
+    const existingHashes = new Set(existingTags?.map(t => t.hash_url) || []);
+    const existingSecCodes = new Set(existingTags?.map(t => t.security_code) || []);
+
+    const newTags = [];
+    const usedHashesInThisBatch = new Set();
+    const usedSecCodesInThisBatch = new Set();
+
+    while (newTags.length < quantity) {
+      const hash = generateHashURL();
+      const secCode = generateSecurityCode();
+
+      const isHashUsed = existingHashes.has(hash) || usedHashesInThisBatch.has(hash);
+      const isSecCodeUsed = existingSecCodes.has(secCode) || usedSecCodesInThisBatch.has(secCode);
+
+      if (!isHashUsed && !isSecCodeUsed) {
+        newTags.push({
+          hash_url: hash,
+          security_code: secCode,
+          status: 'pending'
+        });
+        
+        usedHashesInThisBatch.add(hash);
+        usedSecCodesInThisBatch.add(secCode);
+      }
     }
 
     const { data, error } = await supabase
@@ -24,8 +43,15 @@ export async function POST(req: Request) {
       .select();
 
     if (error) throw error;
-    return Response.json({ success: true, tags: data });
-  } catch (error: any) {
-    return Response.json({ error: error.message }, { status: 500 });
+
+    return Response.json({ 
+      success: true, 
+      count: data.length,
+      tags: data 
+    });
+
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : 'An error occurred';
+    return Response.json({ error: message }, { status: 500 });
   }
 }
