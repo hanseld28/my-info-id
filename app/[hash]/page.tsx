@@ -3,7 +3,7 @@ import { headers } from 'next/headers';
 import { notFound } from 'next/navigation';
 import { pendingTagActivation } from '@/errors/tag-error-templates';
 import { TARGET_CONFIG } from '@/lib/utils/constants';
-import { AlertOctagon, MessageCircleMore, PhoneCall } from 'lucide-react';
+import { AlertOctagon, AlertTriangle, Droplet, MessageCircleMore, PhoneCall, ShieldCheck } from 'lucide-react';
 import ShareLocation from '@/components/ShareLocation';
 import Link from 'next/link';
 
@@ -72,8 +72,43 @@ export default async function ViewerPage({ params }: ViewerProps) {
           <h1 className="text-3xl font-black text-slate-800 mb-1">{data.full_name}</h1>
           <p className="text-slate-500 font-medium mb-6 italic">Informações de Emergência</p>
 
+          {data.quick_instructions && (
+            <div className="mb-6 bg-amber-50 border-l-4 border-amber-500 p-4 rounded-r-xl flex items-center gap-3 text-left">
+              <AlertTriangle className="text-amber-600 shrink-0" size={24} />
+              <div>
+                <p className="text-[10px] font-black text-amber-600 uppercase tracking-wider">Instrução Urgente</p>
+                <p className="text-amber-900 font-bold leading-tight">{data.quick_instructions}</p>
+              </div>
+            </div>
+          )}
+
+          <div className="grid grid-cols-2 gap-4 mb-8">
+
+            {data.blood_type && (
+              <div className="bg-white p-4 rounded-3xl border border-slate-100 shadow-sm flex flex-col items-center justify-center text-center">
+                <div className="w-8 h-8 bg-red-50 text-red-500 rounded-full flex items-center justify-center mb-2">
+                  <Droplet size={18} fill="currentColor" />
+                </div>
+                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Tipo Sanguíneo</p>
+                <span className={`font-black leading-tight ${
+                  data.blood_type?.length > 4 ? 'text-sm' : 'text-xl'
+                } text-slate-800`}>
+                  {data.blood_type || '---'}
+                </span>
+              </div>
+            )}
+
+              <div className="bg-white p-4 rounded-3xl border border-slate-100 shadow-sm flex flex-col items-center justify-center text-center">
+                <div className="w-8 h-8 bg-emerald-50 text-emerald-500 rounded-full flex items-center justify-center mb-2">
+                  <ShieldCheck size={18} />
+                </div>
+                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Proteção</p>
+                <span className="font-black text-emerald-600 text-sm uppercase">Ativa</span>
+              </div>
+
+          </div>
+
           <div className="p-6 space-y-6">
-          
             <label className="text-xs flex justify-start mb-0 font-semibold text-gray-400 uppercase tracking-wider">Contato de Emergência</label>
             <div className="flex items-center justify-between mt-1">
               <span className="text-xl font-medium text-gray-800">{data.phone}</span>
@@ -85,6 +120,22 @@ export default async function ViewerPage({ params }: ViewerProps) {
               </a>
             </div>
           </div>
+
+          {data.phone_secondary && (
+            <div className="p-6 space-y-6">
+              <label className="text-xs flex justify-start mb-0 font-semibold text-gray-400 uppercase tracking-wider">Contato Reserva</label>
+              <div className="flex items-center justify-between mt-1">
+                <span className="text-xl font-medium text-gray-800">{data.phone_secondary}</span>
+                <a 
+                  href={`tel:${data.phone_secondary.replace(/\D/g, '')}`}
+                  className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-2 rounded-full shadow-lg transition duration-150 ease-in-out"
+                >              
+                  <PhoneCall/>
+                </a>
+              </div>
+            </div>
+          )}
+
           <div className="text-left bg-slate-50 p-6 rounded-2xl border border-slate-100">
             <h2 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">Observações</h2>
             <p className="text-slate-700 leading-relaxed whitespace-pre-wrap">
@@ -108,14 +159,14 @@ export default async function ViewerPage({ params }: ViewerProps) {
         <span>Contatar via WhatsApp</span>
       </a>
 
-      <ShareLocation 
+      {/* <ShareLocation 
         phone={data.phone} 
         ownerName={data.full_name} 
-      />
+      /> */}
 
       <div className="max-w-md w-full flex justify-center mt-6 mb-2">
         <Link 
-          href={`/manage-tag/${hash}`}
+          href={`/manage/${hash}`}
           className="flex items-center gap-2 text-[10px] font-bold text-slate-400 hover:text-blue-600 transition-colors uppercase tracking-widest bg-white/50 px-3 py-1.5 rounded-xl border border-slate-200 shadow-sm"
         >
           <AlertOctagon size={12} />

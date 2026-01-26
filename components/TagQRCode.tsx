@@ -7,7 +7,7 @@ interface Props {
 }
 
 export default function TagQRCode({ hash, id }: Props) {
-  const url = `${process.env.NEXT_PUBLIC_SITE_URL}/view-tag/${hash}`;
+  const url = `${process.env.NEXT_PUBLIC_SITE_URL}/${hash}`;
 
   const downloadQR = () => {
     const svg = document.getElementById(`qr-${id}`);

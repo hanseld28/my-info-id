@@ -18,7 +18,7 @@ export default function HomePage() {
 
         <nav aria-label="Ações principais" className="mt-12 flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
           <Link 
-            href="/activate-tag" 
+            href="/activate" 
             className="inline-flex justify-center items-center bg-white text-blue-700 px-10 py-4 rounded-full text-lg font-bold hover:bg-blue-50 transition-all shadow-xl hover:scale-105 active:scale-95 focus:ring-4 focus:ring-white/50 outline-none"
             aria-label="Ir para página de ativação de tag"
           >

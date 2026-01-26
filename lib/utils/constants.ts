@@ -4,8 +4,10 @@ import {
   Dog, 
   Accessibility, 
   PersonStanding, 
-  Users 
+  Users, 
+  LucideProps
 } from 'lucide-react';
+import { ForwardRefExoticComponent, RefAttributes } from 'react';
 
 export const TARGET_TYPE_LABELS: Record<string, string> = {
   child: 'Criança',
@@ -13,11 +15,15 @@ export const TARGET_TYPE_LABELS: Record<string, string> = {
   adult: 'Adulto',
   elderly: 'Idoso',
   pcd: 'PCD (Pessoa com Deficiência)',
-  pet: 'Pet (Cão, Gato, etc)',
+  pet: 'Pet',
   other: 'Outro'
 };
 
-export const TARGET_CONFIG: Record<string, { label: string, icon: any, color: string }> = {
+export const TARGET_TYPE_HUMAN_LIST = ['child', 'teen', 'adult', 'elderly', 'pcd']
+
+export const BLOOD_TYPE_HUMAN_LIST: string[] = ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'];
+
+export const TARGET_CONFIG: Record<string, { label: string, icon: ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>, color: string }> = {
   child: { label: 'Criança', icon: Baby, color: 'bg-pink-100 text-pink-600' },
   teen: { label: 'Adolescente', icon: Users, color: 'bg-purple-100 text-purple-600' },
   adult: { label: 'Adulto', icon: User, color: 'bg-blue-100 text-blue-600' },

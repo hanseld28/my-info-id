@@ -1,14 +1,16 @@
 'use client';
-import { useParams, useRouter } from 'next/navigation';
+import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { maskPhone } from '@/lib/utils/general-utils';
 import LoadingOverlay from '@/components/LoadingOverlay';
 import { TARGET_TYPE_LABELS } from '@/lib/utils/constants';
-import { Info } from 'lucide-react';
+import { Info, ShieldCheck } from 'lucide-react';
 import Link from 'next/link';
+import BloodTypeInput from '@/components/inputs/BloodTypeInput';
 
 export default function ManagePage() {
   const params = useParams();
+  const searchParams = useSearchParams();
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [step, setStep] = useState(1);
@@ -20,16 +22,22 @@ export default function ManagePage() {
     name: '', 
     phone: '', 
     obs: '', 
-    target_type: 'other' 
+    target_type: '',
+    phone_secondary: '',
+    quick_instructions: '',
+    blood_type: ''
   });
 
-  const handleCodeChange = (value: string, index: number) => {
+  const handleCodeChange = useCallback((value: string, index: number) => {
     const val = value.toUpperCase().slice(-1);
     const newCode = [...codeDigits];
     newCode[index] = val;
     setCodeDigits(newCode);
-    if (val && index < 7) inputRefs.current[index + 1]?.focus();
-  };
+    
+    if (val && index < 7) {
+      inputRefs.current[index + 1]?.focus();
+    }
+  }, [codeDigits]);
 
   const handleKeyDown = (e: React.KeyboardEvent, index: number) => {
     if (e.key === 'Backspace' && !codeDigits[index] && index > 0) {
@@ -65,7 +73,10 @@ export default function ManagePage() {
           name: data.full_name || '',
           phone: data.phone || '',
           obs: data.observations || '',
-          target_type: data.target_type || 'other'
+          target_type: data.target_type || null,
+          phone_secondary: data.phone_secondary || '',
+          quick_instructions: data.quick_instructions || '',
+          blood_type: data.blood_type || ''
         });
         setStep(2);
       } else {
@@ -74,7 +85,7 @@ export default function ManagePage() {
         setCodeDigits(new Array(8).fill(""));
         inputRefs.current[0]?.focus();
       }
-    } catch (error) {
+    } catch (_error) {
       alert("Erro ao validar acesso.");
     } finally {
       setLoading(false);
@@ -82,6 +93,14 @@ export default function ManagePage() {
   }, [codeDigits, params]);
 
   useEffect(() => {
+    console.log('searchParams', searchParams);
+    if (searchParams.has('code') && searchParams.get('code')?.length === 8) {
+      setCodeDigits(searchParams.get('code')!.toUpperCase().split(''));
+    }
+  }, [searchParams])
+
+  useEffect(() => {
+    console.log('changed', codeDigits);
     if (codeDigits.join("").length === 8) {
       verifyAndFetch();
     }
@@ -99,14 +118,17 @@ export default function ManagePage() {
         updatedData: { 
           full_name: form.name, 
           phone: form.phone, 
-          observations: form.obs
+          observations: form.obs,
+          phone_secondary: form.phone_secondary,
+          quick_instructions: form.quick_instructions,
+          blood_type: form.blood_type
         }
       }),
     });
 
     if (res.ok) {
       alert("Dados atualizados!");
-      router.push(`/view-tag/${params.hash}`);
+      router.push(`/${params.hash}`);
     } else {
       const err = await res.json();
       alert(err.error);
@@ -160,7 +182,7 @@ export default function ManagePage() {
             
             <div className="flex items-center justify-center mt-8">
               <Link
-                href={`/view-tag/${params.hash}`}
+                href={`/${params.hash}`}
                 className="p-4 bg-blue-600 text-white py-4 rounded-xl font-black text-sm hover:bg-blue-700 shadow-sm transition-all active:scale-95"
               >
                   Voltar para Tag
@@ -173,25 +195,20 @@ export default function ManagePage() {
           <form onSubmit={handleUpdate} className="space-y-5 animate-in fade-in slide-in-from-right-4 duration-500">
             <div className="space-y-4">
               <div className="space-y-1.5">
-                <label className="text-sm font-bold text-slate-700 ml-1">Quem utilizará a Tag?</label>
-                <select
-                  className="w-full p-4 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500"
-                  value={form.target_type}
-                  onChange={e => setForm({...form, target_type: e.target.value})}
+                <label className="text-sm font-bold text-slate-700 ml-1">Tipo de Protegido</label>
+                <input
                   disabled
-                >
-                  <option value="none" disabled hidden>Selecione uma opção</option>
-                  {Object.entries(TARGET_TYPE_LABELS).map(([key, label]) => (
-                    <option key={key} value={key}>{label}</option>
-                  ))}
-                </select>
+                  className="w-full p-4 bg-slate-100 border border-slate-200 rounded-xl outline-none cursor-not-allowed"
+                  value={form.target_type ? TARGET_TYPE_LABELS[form.target_type] : 'Desconhecido'}
+                />
+                <p className="text-[10px] text-slate-400 ml-1 italic font-medium">* Escolhido no momento da ativação ou da compra.</p>
               </div>
 
               <div className="space-y-1.5">
                 <label className="text-sm font-bold text-slate-700 ml-1">Nome</label>
                 <input
                   required
-                  className="w-full p-4 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full p-4 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500"
                   value={form.name}
                   onChange={e => setForm({...form, name: e.target.value})}
                 />
@@ -201,7 +218,7 @@ export default function ManagePage() {
                 <label className="text-sm font-bold text-slate-700 ml-1">Telefone de Emergência</label>
                 <input
                   required
-                  className="w-full p-4 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full p-4 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500"
                   value={form.phone}
                   onChange={e => setForm({...form, phone: maskPhone(e.target.value)})}
                 />
@@ -210,11 +227,54 @@ export default function ManagePage() {
               <div className="space-y-1.5">
                 <label className="text-sm font-bold text-slate-700 ml-1">Observações</label>
                 <textarea
-                  className="w-full p-4 bg-slate-50 border border-slate-200 rounded-xl h-28 outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full p-4 border border-slate-200 rounded-xl h-28 outline-none focus:ring-2 focus:ring-blue-500"
                   value={form.obs}
                   onChange={e => setForm({...form, obs: e.target.value})}
+                  maxLength={1000}
+                />
+                <p className="text-[10px] text-amber-500 ml-1 italic font-bold">{form.obs?.length ? `${form.obs?.length}/1000` : '0/1000'}</p>
+              </div>
+            </div>
+
+            <hr className="border-slate-100" />
+
+            <div className="space-y-4">
+              <h3 className="text-xs font-black text-blue-500 uppercase tracking-widest flex items-center gap-2">
+                <ShieldCheck size={14} />
+                Segurança Avançada (Opcional)
+              </h3>
+
+              <div className="space-y-1.5">
+                <label className="text-sm font-bold text-slate-700">Contato de Secundário</label>
+                <input
+                  type="tel"
+                  placeholder="Segundo telefone (opcional)"
+                  className="w-full p-4 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500"
+                  value={form.phone_secondary}
+                  onChange={e => setForm({...form, phone_secondary: maskPhone(e.target.value)})}
                 />
               </div>
+
+              <div className="space-y-1.5">
+                <label className="text-sm font-bold text-slate-700">Ação Imediata / Alerta</label>
+                <input
+                  placeholder="Ex: Sou diabético / Tenho medo de estranhos"
+                  maxLength={50}
+                  className="w-full p-4 bg-amber-50 border border-amber-200 rounded-xl outline-none focus:ring-2 focus:ring-amber-500 text-amber-900 placeholder:text-amber-400/60"
+                  value={form.quick_instructions}
+                  onChange={e => setForm({...form, quick_instructions: e.target.value})}
+                />
+                <p className="text-[10px] text-slate-400 ml-1 italic font-medium">* Aparece em destaque para quem escanear a tag.</p>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <BloodTypeInput
+                  targetType={form.target_type}
+                  value={form.blood_type}
+                  onChange={(value) => setForm({...form, blood_type: value})}
+                />
+              </div>
+
             </div>
 
             <button

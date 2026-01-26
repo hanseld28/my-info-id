@@ -25,10 +25,10 @@ export default async function Header() {
 
         <nav className="flex items-center gap-4">
           <Link 
-            href="/activate-tag" 
-            className="text-sm font-medium text-slate-600 hover:text-blue-600 transition-colors px-3 py-2 rounded-md hover:bg-blue-50"
+            href="/activate" 
+            className="text-xs font-medium text-slate-600 hover:text-blue-600 transition-colors px-3 py-2 rounded-md hover:bg-blue-50"
           >
-            Ativar Tag
+            ATIVAR TAG
           </Link>
 
           {user ? (<LogoutButton />) : (<></>)}

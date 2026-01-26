@@ -8,7 +8,7 @@ export async function GET(req: Request, { params }: { params: Promise<{ hash: st
 
   const { data, error } = await supabase
     .from('tags')
-    .select('target_type, status, tag_data(full_name, phone, observations)')
+    .select('target_type, status, tag_data(full_name, phone, observations, phone_secondary, quick_instructions, blood_type)')
     .eq('hash_url', hash)
     .single();
 

@@ -22,7 +22,7 @@ export async function GET(request: NextRequest) {
 
   if (error || !tag) {
     return NextResponse.json(
-      { error: 'Código de ativação não inválido.' },
+      { error: 'Código de segurança inválido.' },
       { status: 404 }
     );
   }

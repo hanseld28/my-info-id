@@ -5,23 +5,24 @@ import { formatDateTime } from '@/lib/utils/date-utils';
 import Link from 'next/link';
 import TagQRCode from '@/components/TagQRCode';
 import { TARGET_TYPE_LABELS } from '@/lib/utils/constants';
+import { Tag } from '@/lib/types/tag';
 
 export default function BackofficePanelPage() {
   const [quantity, setQuantity] = useState(1);
-  const [allTags, setAllTags] = useState<any[]>([]);
+  const [allTags, setAllTags] = useState<Tag[]>([]);
   const [filter, setFilter] = useState('all');
   const [loading, setLoading] = useState(false);
   const [loadingMessage, setLoadingMessage] = useState('');
 
   useEffect(() => {
-    fetchTags();
+    fetchTags(filter);
   }, [filter]);
 
-  const fetchTags = async () => {
+  const fetchTags = async (params: string) => {
     setLoading(true);
     setLoadingMessage('Buscando tags...');
     try {
-      const res = await fetch(`/api/v1/tags/list?filter=${filter}`);
+      const res = await fetch(`/api/v1/tags/list?filter=${params}`);
       const data = await res.json();
       if (!data.error) setAllTags(data);
     } finally {
@@ -38,7 +39,9 @@ export default function BackofficePanelPage() {
         body: JSON.stringify({ quantity })
       });
       const data = await res.json();
-      if (data.success) fetchTags();
+      if (data.success) {
+        fetchTags(filter);
+      }
     } finally {
       setLoading(false);
     }
@@ -146,16 +149,16 @@ export default function BackofficePanelPage() {
                   </td>
                   <td className="px-6 py-4">
                     <span className="text-xs font-medium text-slate-600 bg-slate-100 px-2 py-1 rounded-full">
-                      {TARGET_TYPE_LABELS[tag.target_type] || 'Não definido'}
+                      {tag.target_type && TARGET_TYPE_LABELS[tag.target_type] || 'Não definido'}
                     </span>
                   </td>
                   <td className="px-6 py-4">
                     <Link
-                      href={`/view-tag/${tag.hash_url}`} 
+                      href={`/${tag.hash_url}`} 
                       target="_blank"
                       className="text-sm font-mono text-blue-600 hover:text-blue-800"
                     >
-                      /view-tag/{tag.hash_url}
+                      /{tag.hash_url}
                     </Link>
                   </td>
                   <td className="px-6 py-4 text-sm font-bold text-slate-700 tracking-widest uppercase">
