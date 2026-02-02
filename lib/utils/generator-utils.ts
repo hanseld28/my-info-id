@@ -13,4 +13,4 @@ const generateSecureString = (length: number): string => {
 
 export const generateHashURL = () => generateSecureString(8).toLowerCase();
 
-export const generateSecurityCode = () => generateSecureString(8);
+export const generateSecurityCode = () => generateSecureString(6);

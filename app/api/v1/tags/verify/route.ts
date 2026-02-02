@@ -5,9 +5,9 @@ export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const code = searchParams.get('code')?.toUpperCase();
 
-  if (!code || code.length !== 8) {
+  if (!code || code.length !== 6) {
     return NextResponse.json(
-      { error: 'Código inválido. Certifique-se de digitar os 8 caracteres.' },
+      { error: 'Código inválido. Certifique-se de digitar os 6 caracteres.' },
       { status: 400 }
     );
   }
@@ -22,7 +22,7 @@ export async function GET(request: NextRequest) {
 
   if (error || !tag) {
     return NextResponse.json(
-      { error: 'Código de ativação não inválido.' },
+      { error: 'Código de segurança inválido.' },
       { status: 404 }
     );
   }

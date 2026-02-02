@@ -11,7 +11,7 @@ export default function NotFound() {
         </p>
         
         <div className="space-y-4">
-          <Link href="/activate-tag" className="block w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors">
+          <Link href="/activate" className="block w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors">
               Ativar Minha Tag
           </Link>
           <Link href="/" className="block w-full bg-gray-200 text-gray-800 py-3 rounded-lg font-semibold hover:bg-gray-300 transition-colors">
