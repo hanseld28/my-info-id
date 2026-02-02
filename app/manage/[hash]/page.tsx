@@ -1,11 +1,13 @@
 'use client';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { useState, useRef, useEffect, useCallback } from 'react';
-import { maskPhone } from '@/lib/utils/general-utils';
 import LoadingOverlay from '@/components/LoadingOverlay';
 import { TARGET_TYPE_LABELS } from '@/lib/utils/constants';
-import { Info, ShieldCheck } from 'lucide-react';
+import { ActivityIcon, AlertCircle, Info, Pill, Save, ShieldCheck } from 'lucide-react';
 import Link from 'next/link';
+import EmergencyContactManager from '@/components/EmergencyContactManager';
+import { Contact } from '@/lib/types/emergency-contact';
+import HealthCardInput from '@/components/inputs/HealthCardInput';
 import BloodTypeInput from '@/components/inputs/BloodTypeInput';
 
 export default function ManagePage() {
@@ -15,17 +17,22 @@ export default function ManagePage() {
   const [loading, setLoading] = useState(false);
   const [step, setStep] = useState(1);
 
-  const [codeDigits, setCodeDigits] = useState(new Array(8).fill(""));
+  const [codeDigits, setCodeDigits] = useState(new Array(6).fill(""));
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
 
   const [form, setForm] = useState({ 
-    name: '', 
-    phone: '', 
-    obs: '', 
-    target_type: '',
-    phone_secondary: '',
+    full_name: '',
+    birth_date: '',
+    weight_kg: 0,
+    height_cm: 0,
+    blood_type: '',
+    medications: '',
+    allergies: '',
+    health_conditions: '',
     quick_instructions: '',
-    blood_type: ''
+    observations: '',
+    target_type: '',
+    emergency_contacts: [] as Contact[]
   });
 
   const handleCodeChange = useCallback((value: string, index: number) => {
@@ -34,7 +41,7 @@ export default function ManagePage() {
     newCode[index] = val;
     setCodeDigits(newCode);
     
-    if (val && index < 7) {
+    if (val && index < 5) {
       inputRefs.current[index + 1]?.focus();
     }
   }, [codeDigits]);
@@ -50,17 +57,16 @@ export default function ManagePage() {
     const pastedData = e.clipboardData.getData('text').toUpperCase().replace(/[^A-Z0-9]/g, '');
     if (pastedData.length >= 1) {
       const newCode = [...codeDigits];
-      for (let i = 0; i < 8; i++) { if (pastedData[i]) newCode[i] = pastedData[i]; }
+      for (let i = 0; i < 6; i++) { if (pastedData[i]) newCode[i] = pastedData[i]; }
       setCodeDigits(newCode);
-      const nextIndex = Math.min(pastedData.length, 7);
+      const nextIndex = Math.min(pastedData.length, 5);
       inputRefs.current[nextIndex]?.focus();
     }
   };
 
   const verifyAndFetch = useCallback(async () => {
     const securityCode = codeDigits.join("");
-    if (securityCode.length !== 8) return;
-
+    if (securityCode.length !== 6) return;
     setLoading(true);
     try {
       
@@ -70,21 +76,27 @@ export default function ManagePage() {
         const { data } = await res.json();
         
         setForm({
-          name: data.full_name || '',
-          phone: data.phone || '',
-          obs: data.observations || '',
-          target_type: data.target_type || null,
-          phone_secondary: data.phone_secondary || '',
+          target_type: data.target_type || '',
+          full_name: data.full_name || '',
+          birth_date: data.birth_date || '',
+          weight_kg: data.weight_kg || 0,
+          height_cm: data.height_cm || 0,
+          blood_type: data.blood_type || '',
+          medications: data.medications || '',
+          allergies: data.allergies || '',
+          health_conditions: data.health_conditions || '',
           quick_instructions: data.quick_instructions || '',
-          blood_type: data.blood_type || ''
+          emergency_contacts: data.emergency_contacts || [],
+          observations: data.observations || ''
         });
         setStep(2);
       } else {
         const err = await res.json();
         alert(err.error || "Código de segurança incorreto.");
-        setCodeDigits(new Array(8).fill(""));
+        setCodeDigits(new Array(6).fill(""));
         inputRefs.current[0]?.focus();
       }
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (_error) {
       alert("Erro ao validar acesso.");
     } finally {
@@ -94,20 +106,34 @@ export default function ManagePage() {
 
   useEffect(() => {
     console.log('searchParams', searchParams);
-    if (searchParams.has('code') && searchParams.get('code')?.length === 8) {
+    if (searchParams.has('code') && searchParams.get('code')?.length === 6) {
       setCodeDigits(searchParams.get('code')!.toUpperCase().split(''));
     }
   }, [searchParams])
 
   useEffect(() => {
-    console.log('changed', codeDigits);
-    if (codeDigits.join("").length === 8) {
+    if (codeDigits.join("").length === 6) {
       verifyAndFetch();
     }
   }, [codeDigits, verifyAndFetch]);
 
   const handleUpdate = async (e: React.FormEvent) => {
     e.preventDefault();
+  
+    if (form.emergency_contacts.length === 0) {
+      alert("Erro: Você precisa adicionar pelo menos um contato de emergência para que a tag seja útil.");
+      return;
+    }
+
+    const isAllContactsFilled = form.emergency_contacts.every(
+      c => c.name.trim() !== '' && c.phone.trim() !== ''
+    );
+
+    if (!isAllContactsFilled) {
+      alert("Erro: Preencha todos os campos obrigatórios corretamente para os contatos adicionados.");
+      return;
+    }
+
     setLoading(true);
 
     const res = await fetch('/api/v1/tags/update', {
@@ -115,13 +141,18 @@ export default function ManagePage() {
       body: JSON.stringify({
         hash: params.hash,
         security_code: codeDigits.join(""),
-        updatedData: { 
-          full_name: form.name, 
-          phone: form.phone, 
-          observations: form.obs,
-          phone_secondary: form.phone_secondary,
+        updatedData: {
+          full_name: form.full_name, 
+          birth_date: form.birth_date,
+          weight_kg: form.weight_kg,
+          height_cm: form.height_cm,
+          blood_type: form.blood_type,
+          medications: form.medications,
+          allergies: form.allergies,
+          health_conditions: form.health_conditions,
           quick_instructions: form.quick_instructions,
-          blood_type: form.blood_type
+          observations: form.observations,
+          emergency_contacts: form.emergency_contacts
         }
       }),
     });
@@ -140,7 +171,7 @@ export default function ManagePage() {
     <main className="min-h-screen bg-slate-50 flex items-center justify-center p-4">
       {loading && <LoadingOverlay message={step === 1 ? "Verificando permissão..." : "Salvando..."} />}
 
-      <div className="max-w-md w-full bg-white rounded-3xl shadow-xl p-8 border border-slate-100">
+      <div className="max-w-md w-full bg-white rounded-3xl shadow-xl p-8 border border-slate-100 pb-16">
         
         <div className="mb-8 text-center">
           <h1 className="text-2xl font-black text-slate-800">
@@ -204,56 +235,48 @@ export default function ManagePage() {
                 <p className="text-[10px] text-slate-400 ml-1 italic font-medium">* Escolhido no momento da ativação ou da compra.</p>
               </div>
 
-              <div className="space-y-1.5">
-                <label className="text-sm font-bold text-slate-700 ml-1">Nome</label>
-                <input
-                  required
-                  className="w-full p-4 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500"
-                  value={form.name}
-                  onChange={e => setForm({...form, name: e.target.value})}
-                />
-              </div>
+              <section className="space-y-4">
+                <h2 className="text-xs font-black text-slate-400 uppercase tracking-widest ml-2">Identificação</h2>
 
-              <div className="space-y-1.5">
-                <label className="text-sm font-bold text-slate-700 ml-1">Telefone de Emergência</label>
-                <input
-                  required
-                  className="w-full p-4 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500"
-                  value={form.phone}
-                  onChange={e => setForm({...form, phone: maskPhone(e.target.value)})}
-                />
-              </div>
+                <div className="space-y-1.5">
+                  <label className="text-sm font-bold text-slate-700 ml-1">
+                    Nome
+                    <span className="text-red-500"> *</span>
+                  </label>
+                  <input
+                    className="w-full p-4 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 invalid:focus:ring-red-500"
+                    value={form.full_name}
+                    onChange={e => setForm({...form, full_name: e.target.value})}
+                    required
+                  />
+                </div>
 
-              <div className="space-y-1.5">
-                <label className="text-sm font-bold text-slate-700 ml-1">Observações</label>
-                <textarea
-                  className="w-full p-4 border border-slate-200 rounded-xl h-28 outline-none focus:ring-2 focus:ring-blue-500"
-                  value={form.obs}
-                  onChange={e => setForm({...form, obs: e.target.value})}
-                  maxLength={1000}
-                />
-                <p className="text-[10px] text-amber-500 ml-1 italic font-bold">{form.obs?.length ? `${form.obs?.length}/1000` : '0/1000'}</p>
-              </div>
+                <div className="space-y-1.5">
+                  <label className="text-sm font-bold text-slate-700 ml-1">Data de Nascimento</label>
+                  <input 
+                    type="date"
+                    className="w-full p-4 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500"
+                    value={form.birth_date}
+                    onChange={e => setForm({...form, birth_date: e.target.value})}
+                  />
+                </div>
+              </section>
             </div>
+
+            <hr className="border-slate-100" />
+
+            <EmergencyContactManager 
+              contacts={form.emergency_contacts}
+              onChange={(newContacts) => setForm({ ...form, emergency_contacts: newContacts })}
+            />
 
             <hr className="border-slate-100" />
 
             <div className="space-y-4">
               <h3 className="text-xs font-black text-blue-500 uppercase tracking-widest flex items-center gap-2">
                 <ShieldCheck size={14} />
-                Segurança Avançada (Opcional)
+                Segurança Avançada
               </h3>
-
-              <div className="space-y-1.5">
-                <label className="text-sm font-bold text-slate-700">Contato de Secundário</label>
-                <input
-                  type="tel"
-                  placeholder="Segundo telefone (opcional)"
-                  className="w-full p-4 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500"
-                  value={form.phone_secondary}
-                  onChange={e => setForm({...form, phone_secondary: maskPhone(e.target.value)})}
-                />
-              </div>
 
               <div className="space-y-1.5">
                 <label className="text-sm font-bold text-slate-700">Ação Imediata / Alerta</label>
@@ -264,25 +287,114 @@ export default function ManagePage() {
                   value={form.quick_instructions}
                   onChange={e => setForm({...form, quick_instructions: e.target.value})}
                 />
-                <p className="text-[10px] text-slate-400 ml-1 italic font-medium">* Aparece em destaque para quem escanear a tag.</p>
+                <p className="text-[10px] text-slate-400 ml-1 italic font-medium">* Aparece em destaque na página de visualização das informações da tag.</p>
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
+              <hr className="border-slate-100" />
+
+              <section className="space-y-3">
+                <h2 className="text-xs font-black text-slate-400 uppercase tracking-widest ml-2">Saúde e Alergias</h2>
+        
+                <div className="space-y-3">
+                  <HealthCardInput 
+                    label="Alergias"
+                    placeholder="Ex: Penicilina, Amendoim..."
+                    value={form.allergies}
+                    onChange={val => setForm({...form, allergies: val})}
+                    icon={<AlertCircle />}
+                    iconColor="text-red-500"
+                  />
+
+                  <HealthCardInput 
+                    label="Medicamentos"
+                    placeholder="Ex: Insulina, Anti-hipertensivo..."
+                    value={form.medications}
+                    onChange={val => setForm({...form, medications: val})}
+                    icon={<Pill />}
+                    iconColor="text-blue-500"
+                  />
+                  <HealthCardInput 
+                    label="Condições Médicas"
+                    placeholder="Ex: Diabetes, Hipertensão..."
+                    value={form.health_conditions}
+                    onChange={value => setForm({...form, health_conditions: value})}
+                    icon={<ActivityIcon />}
+                    iconColor="text-violet-500"
+                  />
+                </div>
+              </section>
+
+              <hr className="border-slate-100" />
+
+              <section className="space-y-3">
+                <h2 className="text-xs font-black text-slate-400 uppercase tracking-widest ml-2">Informações Adicionais</h2>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-1.5">
+                    <label className="text-sm font-bold text-slate-700 ml-1">Peso (kg)</label>
+                    <div className="relative">
+                      <input
+                        type="number"
+                        step="0.1"
+                        placeholder="0.0"
+                        className="w-full p-4 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 pr-12 font-semibold text-slate-700"
+                        value={form.weight_kg}
+                        onChange={e => setForm({...form, weight_kg: Number(e.target.value)})}
+                      />
+                      <span className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 text-sm font-bold pointer-events-none">
+                        kg
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <label className="text-sm font-bold text-slate-700 ml-1">Altura (cm)</label>
+                    <div className="relative">
+                      <input
+                        type="number"
+                        placeholder="000"
+                        className="w-full p-4 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 pr-12 font-semibold text-slate-700"
+                        value={form.height_cm}
+                        onChange={e => setForm({...form, height_cm: Number(e.target.value)})}
+                      />
+                      <span className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 text-sm font-bold pointer-events-none">
+                        cm
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
                 <BloodTypeInput
                   targetType={form.target_type}
                   value={form.blood_type}
                   onChange={(value) => setForm({...form, blood_type: value})}
                 />
+                
+              </section>
+
+              <div className="space-y-1.5">
+                <label className="text-sm font-bold text-slate-700 ml-1">Observações</label>
+                <textarea
+                  className="w-full p-4 border border-slate-200 rounded-xl h-28 outline-none focus:ring-2 focus:ring-blue-500"
+                  value={form.observations}
+                  onChange={e => setForm({...form, observations: e.target.value})}
+                  maxLength={1000}
+                />
+                <p className="text-[10px] text-amber-500 ml-1 italic font-bold">{form.observations?.length ? `${form.observations?.length}/1000` : '0/1000'}</p>
               </div>
 
             </div>
 
-            <button
-              type="submit"
-              className="w-full bg-blue-600 text-white py-4 rounded-xl font-black text-sm hover:bg-blue-700 shadow-sm transition-all active:scale-95"
-            >
-              SALVAR ALTERAÇÕES
-            </button>
+            <div className="fixed bottom-4 left-0 right-0  max-w-md w-full mx-auto">
+              <button 
+                type="submit"
+                className="w-full bg-blue-600 text-white py-5 cursor-pointer rounded-3xl font-black text-sm shadow-sm flex items-center justify-center gap-3 hover:bg-blue-700 active:scale-[0.98] transition-all"
+              >
+                <Save size={22} />
+                SALVAR ALTERAÇÕES
+              </button>
+            </div>
+            
           </form>
         )}
       </div>

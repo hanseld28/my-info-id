@@ -8,11 +8,35 @@ export async function GET(req: Request, { params }: { params: Promise<{ hash: st
 
   const { data, error } = await supabase
     .from('tags')
-    .select('target_type, status, tag_data(full_name, phone, observations, phone_secondary, quick_instructions, blood_type)')
+    .select(`
+      target_type, 
+      status, 
+      tag_data(
+        full_name, 
+        birth_date, 
+        weight_kg, 
+        height_cm, 
+        blood_type, 
+        medications, 
+        allergies, 
+        health_conditions, 
+        quick_instructions,
+        observations,
+        updated_at,
+        emergency_contacts(
+          id,
+          name,
+          phone,
+          relationship,
+          is_primary
+        )
+      )
+    `)
     .eq('hash_url', hash)
     .single();
 
   if (error || !data) {
+    console.log(error)
     return Response.json({ error: "Tag não encontrada" }, { status: 404 });
   }
 
@@ -26,7 +50,8 @@ export async function GET(req: Request, { params }: { params: Promise<{ hash: st
       success: true,
       data: {
         ...tagData,
-        target_type: data.target_type
+        target_type: data.target_type,
+        emergency_contacts: tagData.emergency_contacts || []
       }
     });
 }

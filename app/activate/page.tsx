@@ -1,20 +1,26 @@
 'use client';
 import { useState, useRef, useEffect } from 'react';
-import { maskPhone } from '@/lib/utils/general-utils';
 import LoadingOverlay from '@/components/LoadingOverlay';
 import { TARGET_TYPE_LABELS } from '@/lib/utils/constants';
 import { Tag } from '@/lib/types/tag';
-import { Check, Eye, PlusCircle } from 'lucide-react';
+import { Check, Eye, Lightbulb, PlusCircle } from 'lucide-react';
 import Link from 'next/link';
+import EmergencyContactManager from '@/components/EmergencyContactManager';
+import { Contact } from '@/lib/types/emergency-contact';
 
 export default function ActivatePage() {
   const [loading, setLoading] = useState(false);
   const [step, setStep] = useState(1);
   
-  const [codeDigits, setCodeDigits] = useState(new Array(8).fill(""));
+  const [codeDigits, setCodeDigits] = useState(new Array(6).fill(""));
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
 
-  const [form, setForm] = useState({ target_type: 'none', name: '', phone: '', obs: '' });
+  const [form, setForm] = useState({
+    target_type: 'none',
+    full_name: '',
+    emergency_contacts: [] as Contact[],
+    observations: ''
+  });
 
   const [tag, setTag] = useState<Tag | null>(null);
 
@@ -24,7 +30,7 @@ export default function ActivatePage() {
     newCode[index] = val;
     setCodeDigits(newCode);
 
-    if (val && index < 7) {
+    if (val && index < 5) {
       inputRefs.current[index + 1]?.focus();
     }
   };
@@ -42,7 +48,7 @@ export default function ActivatePage() {
     if (pastedData.length >= 1) {
       const newCode = [...codeDigits];
       
-      for (let i = 0; i < 8; i++) {
+      for (let i = 0; i < 6; i++) {
         if (pastedData[i]) {
           newCode[i] = pastedData[i];
         }
@@ -50,14 +56,14 @@ export default function ActivatePage() {
       
       setCodeDigits(newCode);
 
-      const nextIndex = Math.min(pastedData.length, 7);
+      const nextIndex = Math.min(pastedData.length, 5);
       inputRefs.current[nextIndex]?.focus();
     }
   };
 
   useEffect(() => {
     const fullCode = codeDigits.join("");
-    if (fullCode.length === 8) {
+    if (fullCode.length === 6) {
       verifyAndNext(fullCode);
     }
   }, [codeDigits]);
@@ -71,12 +77,13 @@ export default function ActivatePage() {
       } else {
         const err = await res.json();
         alert(err.error || "Código inválido ou já utilizado.");
-        setCodeDigits(new Array(8).fill(""));
+        setCodeDigits(new Array(6).fill(""));
         inputRefs.current[0]?.focus();
       }
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (_error) {
       alert("Não foi possível validar o código no momento. Tente novamente mais tarde.");
-      setCodeDigits(new Array(8).fill(""));
+      setCodeDigits(new Array(6).fill(""));
       inputRefs.current[0]?.focus();
     } finally {
       setLoading(false);
@@ -85,13 +92,19 @@ export default function ActivatePage() {
 
   const handleActivate = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
     
-    const finalData = { ...form, code: codeDigits.join("") };
+    const data = { ...form, code: codeDigits.join("") };
+
+    if (data.emergency_contacts.length === 0) {
+      alert("Adicione pelo menos um contato de emergência!");
+      return;
+    }
+    
+    setLoading(true);
 
     const res = await fetch('/api/v1/tags/activate', {
       method: 'POST',
-      body: JSON.stringify(finalData),
+      body: JSON.stringify(data),
     });
 
     if (res.ok) {
@@ -176,21 +189,23 @@ export default function ActivatePage() {
           )}
 
           {step === 2 && (
-            <form onSubmit={handleActivate} className="animate-in fade-in slide-in-from-right-4 duration-500 space-y-5">
+            <form onSubmit={handleActivate} className="animate-in fade-in slide-in-from-right-4 duration-500 space-y-6">
               <div className="text-center mb-6">
                 <span className="bg-emerald-100 text-emerald-600 text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-widest">Passo 2 de 2</span>
-                <h1 className="text-2xl font-black text-slate-800 mt-4 mb-2">Dados da Tag</h1>
-                <p className="text-slate-500 text-sm">Informações que aparecerão ao escanear.</p>
+                <h1 className="text-2xl font-black text-slate-800 mt-4 mb-2">Configuração Rápida</h1>
+                <p className="text-slate-500 text-sm">Dados essenciais para sua Tag começar a funcionar.</p>
               </div>
 
-              <div className="space-y-4">
-
+              <div className="space-y-5">
                 <div className="space-y-1.5">
-                  <label htmlFor="target_type" className="text-sm font-bold text-slate-700 ml-1">Quem utilizará esta Tag?</label>
+                  <label htmlFor="target_type" className="text-sm font-bold text-slate-700 ml-1">
+                    Quem utilizará esta Tag?
+                    <span className="text-red-500"> *</span>
+                  </label>
                   <select
                     id="target_type"
                     required
-                    className="w-full p-4 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full p-4 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 bg-white font-medium text-slate-700"
                     value={form.target_type}
                     onChange={e => setForm({...form, target_type: e.target.value})}
                   >
@@ -199,60 +214,67 @@ export default function ActivatePage() {
                       <option key={key} value={key}>{label}</option>
                     ))}
                   </select>
-                  <p className="text-[10px] text-red-500 ml-1 font-bold">* Lembre-se: Esta informação não poderá ser alterada mais tarde.</p>
-
+                  <p className="text-[10px] text-red-500 ml-1 font-bold italic">* Esta informação não poderá ser alterada mais tarde.</p>
                 </div>
 
                 <div className="space-y-1.5">
-                  <label htmlFor="name" className="text-sm font-bold text-slate-700 ml-1">Nome do Protegido</label>
+                  <label htmlFor="name" className="text-sm font-bold text-slate-700 ml-1">
+                    Nome
+                    <span className="text-red-500"> *</span>
+                  </label>
                   <input
                     id="name"
                     required
-                    placeholder="Ex: Nome da Criança, Idoso, Pet etc."
-                    className="w-full p-4 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 transition-all"
-                    onChange={e => setForm({...form, name: e.target.value})}
+                    placeholder="Ex: João Silva, Totó, etc."
+                    className="w-full p-4 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 font-medium text-slate-700"
+                    value={form.full_name}
+                    onChange={e => setForm({...form, full_name: e.target.value})}
                   />
                 </div>
-                
-                <div className="space-y-1.5">
-                  <label htmlFor="phone" className="text-sm font-bold text-slate-700 ml-1">Telefone de Emergência</label>
-                  <input
-                    id="phone"
-                    required
-                    type="tel"
-                    placeholder="(00) 00000-0000"
-                    className="w-full p-4 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 transition-all"
-                    value={form.phone}
-                    onChange={e => setForm({...form, phone: maskPhone(e.target.value)})}
+
+                <div className="pt-2">
+                  <EmergencyContactManager 
+                    contacts={form.emergency_contacts}
+                    onChange={(contacts) => setForm({...form, emergency_contacts: contacts})}
                   />
                 </div>
 
                 <div className="space-y-1.5">
-                  <label htmlFor="obs" className="text-sm font-bold text-slate-700 ml-1">Observações</label>
+                  <label htmlFor="observations" className="text-sm font-bold text-slate-700 ml-1">Observações</label>
                   <textarea
-                    id="obs"
-                    placeholder="Ex: Alérgico a Penicilina, Tipo Sanguíneo A+..."
-                    className="w-full p-4 border border-slate-200 rounded-xl h-32 outline-none focus:ring-2 focus:ring-blue-500 transition-all"
-                    onChange={e => setForm({...form, obs: e.target.value})}
+                    id="observations"
+                    placeholder="Ex: Alérgico a penicilina, diabético..."
+                    className="w-full p-4 border border-slate-200 rounded-xl h-28 outline-none focus:ring-2 focus:ring-blue-500 font-medium text-slate-700 resize-none"
+                    value={form.observations}
+                    onChange={e => setForm({...form, observations: e.target.value})}
                     maxLength={1000}
                   />
                 </div>
 
-                <button
-                  type="submit"
-                  disabled={loading}
-                  className="w-full bg-blue-600 text-white py-4 rounded-xl font-black text-sm hover:bg-blue-700 shadow-lg shadow-blue-100 transition-all active:scale-95"
-                >
-                  CONCLUIR ATIVAÇÃO
-                </button>
-                
-                <button 
-                  type="button"
-                  onClick={() => setStep(1)}
-                  className="w-full text-slate-400 text-xs font-bold uppercase tracking-widest hover:text-slate-600"
-                >
-                  Voltar
-                </button>
+                <div className="bg-blue-50/50 border border-blue-100 p-4 rounded-2xl">
+                  <p className="text-[11px] text-blue-600 font-medium text-center leading-relaxed">
+                    <Lightbulb size={16} className="inline mr-1"/>
+                    <strong>Dica:</strong> Após ativar, você poderá complementar o cadastro com informações adicionais, tipo sanguíneo, medicamentos e muito mais!
+                  </p>
+                </div>
+
+                <div className="space-y-3 pt-2">
+                  <button
+                    type="submit"
+                    disabled={loading}
+                    className="w-full bg-blue-600 text-white py-4 rounded-xl font-black text-sm hover:bg-blue-700 shadow-lg shadow-blue-100 transition-all active:scale-95 disabled:opacity-50"
+                  >
+                    CONCLUIR ATIVAÇÃO
+                  </button>
+                  
+                  <button 
+                    type="button"
+                    onClick={() => setStep(1)}
+                    className="w-full text-slate-400 text-[10px] font-black uppercase tracking-[0.2em] hover:text-slate-600"
+                  >
+                    Voltar
+                  </button>
+                </div>
               </div>
             </form>
           )}
