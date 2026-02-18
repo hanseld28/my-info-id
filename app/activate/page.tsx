@@ -152,7 +152,7 @@ export default function ActivatePage() {
           </div>
 
           <p className="mt-8 text-xs text-slate-400">
-            Você poderá editar estas informações sempre que quiser usando seu código de segurança.
+            Você poderá editar estas informações sempre que quiser utilizando o código de segurança da tag ou vinculando-a a uma conta de usuário.
           </p>
         </div>
       )}
@@ -160,32 +160,34 @@ export default function ActivatePage() {
         <div className="max-w-md w-full bg-white rounded-3xl shadow-xl p-8 border border-slate-100 min-h-100 flex flex-col justify-center">
           
           {step === 1 && (
-            <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-              <div className="text-center mb-8">
-                <span className="bg-blue-100 text-blue-600 text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-widest">Passo 1 de 2</span>
-                <h1 className="text-2xl font-black text-slate-800 mt-4 mb-2">Validar Tag</h1>
-                <p className="text-slate-500 text-sm">Digite os 8 caracteres do código de segurança presente na embalagem da sua da sua tag física.</p>
-              </div>
+            <>
+              <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+                <div className="text-center mb-8">
+                  <span className="bg-blue-100 text-blue-600 text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-widest">Passo 1 de 2</span>
+                  <h1 className="text-2xl font-black text-slate-800 mt-4 mb-2">Validar Tag</h1>
+                  <p className="text-slate-500 text-sm">Digite os 6 caracteres do código de segurança presente na embalagem da sua da sua tag física.</p>
+                </div>
 
-              <div className="flex justify-between gap-2" onPaste={handlePaste}>
-                {codeDigits.map((digit, index) => (
-                  <input
-                    key={index}
-                    ref={(el) => {
-                      inputRefs.current[index] = el;
-                    }}
-                    type="text"
-                    maxLength={1}
-                    autoFocus={index === 0}
-                    value={digit}
-                    onChange={(e) => handleCodeChange(e.target.value, index)}
-                    onKeyDown={(e) => handleKeyDown(e, index)}
-                    onPaste={handlePaste}
-                    className="w-full h-14 text-center text-xl font-bold border-2 border-slate-200 rounded-xl outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-50 transition-all"
-                  />
-                ))}
+                <div className="flex justify-between gap-2" onPaste={handlePaste}>
+                  {codeDigits.map((digit, index) => (
+                    <input
+                      key={index}
+                      ref={(el) => {
+                        inputRefs.current[index] = el;
+                      }}
+                      type="text"
+                      maxLength={1}
+                      autoFocus={index === 0}
+                      value={digit}
+                      onChange={(e) => handleCodeChange(e.target.value, index)}
+                      onKeyDown={(e) => handleKeyDown(e, index)}
+                      onPaste={handlePaste}
+                      className="w-full h-14 text-center text-xl font-bold border-2 border-slate-200 rounded-xl outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-50 transition-all"
+                    />
+                  ))}
+                </div>
               </div>
-            </div>
+            </>
           )}
 
           {step === 2 && (

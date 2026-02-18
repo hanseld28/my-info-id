@@ -10,6 +10,11 @@ import {
 import { ForwardRefExoticComponent, RefAttributes } from 'react';
 import { ContactRelationship } from '../types/emergency-contact';
 
+export const TAG_STATUS_TYPE_MAP: Record<string, string> = {
+  pending: 'Pendente',
+  active: 'Ativa',
+};
+
 export const TARGET_TYPE_LABELS: Record<string, string> = {
   child: 'Criança',
   teen: 'Adolescente',

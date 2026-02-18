@@ -6,6 +6,7 @@ export async function POST(request: Request) {
   try {
     const { code, target_type, full_name, emergency_contacts, observations } = await request.json();
     const supabase = await createSupabaseServerClient();
+    const { data: { user } } = await supabase.auth.getUser();
 
     const { data: tag, error: tagError } = await supabase
       .from('tags')
@@ -54,7 +55,8 @@ export async function POST(request: Request) {
       .update({ 
         target_type, 
         status: 'active',
-        activated_at: new Date().toISOString() 
+        activated_at: new Date().toISOString(),
+        owner_id: user?.id || null
       })
       .eq('id', tag.id)
       .select()
