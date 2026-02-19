@@ -1,18 +1,19 @@
 import { createSupabaseServerClient } from '@/lib/supabase/server';
 import { headers } from 'next/headers';
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { waitUntil } from '@vercel/functions';
 
 export const runtime = 'edge' 
 
 export async function GET(
-  request: Request,
-  { params }: { params: { token: string } }
+  request: NextRequest,
+  context: { params: Promise<{ token: string }> }
 ) {
-  const { token } = (await params);
-  const headerList = await headers();
-
+  const { token } = await context.params;
+  
   const safeToken = token.toLowerCase();
+  
+  const headerList = await headers();
 
   if (!/^[a-z0-9]{14}$/.test(safeToken)) {
     return NextResponse.redirect(new URL('/404', request.url));

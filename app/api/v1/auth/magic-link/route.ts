@@ -1,7 +1,8 @@
 import { createSupabaseServerClient } from '@/lib/supabase/server';
 import { getBaseUrl } from '@/lib/utils/get-url';
+import { NextRequest } from 'next/server';
 
-export async function POST (request: Request) {
+export async function POST (request: NextRequest) {
   try {
     const { email, token } = await request.json();
 
