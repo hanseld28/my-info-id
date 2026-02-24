@@ -1,12 +1,11 @@
 'use client';
-import { Plus, CreditCard, Tag, X } from 'lucide-react';
+import { Plus, CreditCard } from 'lucide-react';
 import Link from 'next/link';
-import { TagActions } from '@/components/TagActions';
-import { TAG_STATUS_TYPE_MAP, TARGET_CONFIG, TARGET_TYPE_LABELS } from '@/lib/utils/constants';
 import { useEffect, useState } from 'react';
 import { TagBasicData } from '@/lib/types/tag';
 import LoadingOverlay from '@/components/LoadingOverlay';
 import BindTagModal from '@/components/BindTagModal';
+import OwnerTagCard from '@/components/OwnerTagCard';
 
 export default function DashboardPage() {
   const [loading, setLoading] = useState(false);
@@ -63,9 +62,9 @@ export default function DashboardPage() {
           <BindTagModal onSuccess={refreshTags} />
           <Link 
             href="/activate"
-            className=" bg-green-600 text-white py-4 p-4 mt-4 rounded-xl font-black text-sm hover:bg-green-700 shadow-lg shadow-emerald-100 flex items-center gap-2 disabled:opacity-50 uppercase tracking-widest hover:scale-105 active:scale-95 transition-all"
+            className=" bg-green-600 text-white py-4 p-4 mt-4 rounded-xl font-black text-xs hover:bg-green-700 shadow-lg shadow-emerald-100 flex items-center gap-2 disabled:opacity-50 uppercase tracking-widest hover:scale-105 active:scale-95 transition-all"
           >
-            <Plus size={18} /> Nova Tag
+            <Plus size={18} /> Nova Ativação
           </Link>
         </div>
       </header>
@@ -89,33 +88,10 @@ export default function DashboardPage() {
 
         <div className="grid gap-4">
           {userTags?.map((tag) => (
-            <div 
+            <OwnerTagCard
               key={tag.hash_url}
-              className="bg-white p-5 rounded-[2.5rem] border border-slate-100 shadow-sm transition-all flex flex-col md:flex-row items-start md:items-center justify-between gap-4"
-            >
-              <div className="flex items-center gap-4">
-                <div className={`w-14 h-14 ${tag?.target_type && TARGET_CONFIG[tag.target_type]?.color || 'text-slate-400 bg-slate-50'} rounded-3xl flex items-center justify-center shadow-inner`}>
-                  <Tag size={28} />
-                </div>
-                <div>
-                  <h3 className="font-black text-slate-800 text-lg leading-tight">
-                    {tag.tag_data?.full_name || 'Usuário sem nome'}
-                  </h3>
-                  <div className="flex items-center gap-2 mt-1">
-                    <span className={`text-[10px] font-bold ${tag?.target_type && TARGET_CONFIG[tag.target_type]?.color || 'text-slate-400 bg-slate-50'} font-mono px-1.5 py-0.5 rounded`}>
-                      {tag.target_type ? TARGET_TYPE_LABELS[tag.target_type] : 'Tipo não definido'}
-                    </span>
-                    <span className={`text-[10px] font-black uppercase px-2 py-0.5 rounded-full ${
-                      tag.status === 'active' ? 'bg-emerald-50 text-emerald-600' : 'bg-amber-50 text-amber-600'
-                    }`}>
-                      {tag.status ? TAG_STATUS_TYPE_MAP[tag.status] : '-'}
-                    </span>
-                  </div>
-                </div>
-              </div>
-
-              <TagActions tag={tag} />
-            </div>
+              tag={tag}
+            />
           ))}
         </div>
       </main>

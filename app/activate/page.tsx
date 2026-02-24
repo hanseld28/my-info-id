@@ -15,6 +15,8 @@ export default function ActivatePage() {
   const [codeDigits, setCodeDigits] = useState(new Array(6).fill(""));
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
 
+  const [termsAccepted, setTermsAccepted] = useState(false);
+
   const [form, setForm] = useState({
     target_type: 'none',
     full_name: '',
@@ -92,8 +94,16 @@ export default function ActivatePage() {
 
   const handleActivate = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    const data = { ...form, code: codeDigits.join("") };
+
+    if (!termsAccepted) {
+      return alert("Você precisa aceitar os termos para ativar a tag e utilizar nossos serviços.");
+    }
+
+    const data = {
+      ...form,
+      code: codeDigits.join(""),
+      terms_accepted: termsAccepted
+    };
 
     if (data.emergency_contacts.length === 0) {
       alert("Adicione pelo menos um contato de emergência!");
@@ -260,10 +270,55 @@ export default function ActivatePage() {
                   </p>
                 </div>
 
+                <div className="flex items-start gap-4 p-5 bg-blue-50/50 rounded-2xl border border-blue-100/50 transition-all hover:bg-blue-50">
+                  <div className="relative flex items-center shrink-0 mt-0.5">
+                    <input 
+                      type="checkbox" 
+                      id="lgpd"
+                      checked={termsAccepted}
+                      onChange={(e) => setTermsAccepted(e.target.checked)}
+                      className="peer h-5 w-5 cursor-pointer appearance-none rounded-md border-2 border-blue-200 bg-white 
+                                checked:bg-blue-600 checked:border-blue-600 transition-all duration-200
+                                focus:outline-none focus:ring-4 focus:ring-blue-100"
+                    />
+                    <svg
+                      className="absolute h-3.5 w-3.5 ml-0.5 text-white opacity-0 peer-checked:opacity-100 transition-opacity pointer-events-none"
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <polyline points="20 6 9 17 4 12"></polyline>
+                    </svg>
+                  </div>
+
+                  <label htmlFor="lgpd" className="text-[11px] md:text-xs text-blue-900/80 leading-relaxed cursor-pointer select-none">
+                    Autorizo a <strong>exibição pública</strong> dos meus dados de saúde para fins de emergência e declaro que li e aceito os 
+                    <Link
+                      href="/legal/terms"
+                      className="text-blue-700 font-bold hover:underline mx-1"
+                      target="_blank"
+                    >
+                      Termos de Uso
+                    </Link> 
+                    e a 
+                    <Link
+                      href="/legal/privacy"
+                      className="text-blue-700 font-bold hover:underline ml-1"
+                      target="_blank"
+                    >
+                      Política de Privacidade
+                    </Link>.
+                  </label>
+                </div>
+
                 <div className="space-y-3 pt-2">
                   <button
                     type="submit"
-                    disabled={loading}
+                    disabled={loading || !termsAccepted}
                     className="w-full bg-blue-600 text-white py-4 rounded-xl font-black text-sm hover:bg-blue-700 shadow-lg shadow-blue-100 transition-all active:scale-95 disabled:opacity-50"
                   >
                     CONCLUIR ATIVAÇÃO
@@ -274,7 +329,7 @@ export default function ActivatePage() {
                     onClick={() => setStep(1)}
                     className="w-full text-slate-400 text-[10px] font-black uppercase tracking-[0.2em] hover:text-slate-600"
                   >
-                    Voltar
+                    VOLTAR
                   </button>
                 </div>
               </div>

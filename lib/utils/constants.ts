@@ -10,6 +10,15 @@ import {
 import { ForwardRefExoticComponent, RefAttributes } from 'react';
 import { ContactRelationship } from '../types/emergency-contact';
 
+export const CURRENT_TERMS_VERSION = '1.0.0';
+
+export const CONSENT_TERMS_TYPE: Record<string, string> = {
+  lgpd_general: 'LGPD Geral',
+  lgpd_health_data: 'LGPD Saúde',
+  terms_of_service: 'Termos de Uso',
+  privacy_policy: 'Política de Privacidade'
+};
+
 export const TAG_STATUS_TYPE_MAP: Record<string, string> = {
   pending: 'Pendente',
   active: 'Ativa',

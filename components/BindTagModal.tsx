@@ -1,6 +1,6 @@
 'use client';
 import { useState, useRef, useEffect, useCallback } from 'react';
-import { Plus, X, ShieldCheck, Loader2 } from 'lucide-react';
+import { X, ShieldCheck, Loader2, Link } from 'lucide-react';
 
 interface Props {
   onSuccess: () => void;
@@ -81,9 +81,9 @@ export default function BindTagModal({ onSuccess }: Props) {
     <>
       <button 
         onClick={() => setIsOpen(true)}
-        className="flex items-center justify-end gap-2 bg-blue-600 text-white mt-4 py-4 p-4 rounded-xl font-black text-sm hover:bg-blue-700 shadow-sm shadow-blue-100 disabled:opacity-50 uppercase tracking-widest hover:scale-105 active:scale-95 transition-all"
+        className="flex items-center justify-end gap-2 bg-blue-600 text-white mt-4 py-4 p-4 rounded-xl font-black text-xs hover:bg-blue-700 shadow-sm shadow-blue-100 disabled:opacity-50 uppercase tracking-widest hover:scale-105 active:scale-95 transition-all"
       >
-        <Plus size={16} /> Vincular Tag
+        <Link size={16} /> Vincular Existente
       </button>
 
       {isOpen && (

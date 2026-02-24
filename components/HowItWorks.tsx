@@ -1,6 +1,6 @@
 export default function HowItWorks() {
   const steps = [
-    { icon: "⚡", title: "Adquira sua Tag", desc: "Receba sua tag física NFC (adesivo, chaveiro ou pulseira) com tecnologia Meu Info ID." },
+    { icon: "⚡", title: "Adquira sua Tag", desc: "Receba sua tag física NFC em formato de chaveiro com tecnologia Meu Info ID." },
     { icon: "📱", title: "Aproxime e Ative", desc: "Encoste seu celular na tag e use o código de ativação exclusivo para cadastrar seus dados." },
     { icon: "📝", title: "Personalize", desc: "Insira contatos de emergência, alergias ou avisos importantes. Altere quando quiser!" },
     { icon: "🛡️", title: "Proteção Pronta", desc: "Agora, qualquer pessoa que aproximar o celular da tag verá suas informações e poderá ajudar." }

@@ -1,6 +1,8 @@
 import { Viewport } from 'next';
 import './globals.css';
 import Header from '@/components/Header';
+import CookieBanner from '@/components/legal/CookieBanner';
+import Footer from '@/components/Footer';
 
 export const viewport: Viewport = {
   colorScheme: 'light',
@@ -26,7 +28,9 @@ export default function RootLayout({
         <Header />
         <main>
           {children}
+          <CookieBanner />
         </main>
+        <Footer />
       </body>
     </html>
   );
