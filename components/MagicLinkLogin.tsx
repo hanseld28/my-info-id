@@ -8,7 +8,7 @@ export default function MagicLinkLogin() {
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const [sent, setSent] = useState(false);
-  const [turnstileStatus, setTurnstileStatus] = useState<"required" | "success" | "error" | "expired">("required");
+  const [turnstileStatus, setTurnstileStatus] = useState<'none' | 'required' | 'success' | 'error' | 'expired'>('none');
   const [error, setError] = useState<string | null>(null);
 
   const formRef = useRef<HTMLFormElement>(null);
@@ -119,7 +119,7 @@ export default function MagicLinkLogin() {
       )}
 
       <button
-        disabled={loading || turnstileStatus !== "success"}
+        disabled={loading || !['none', 'success'].includes(turnstileStatus)}
         className="w-full bg-blue-600 text-white py-4 rounded-2xl font-black text-sm flex items-center justify-center gap-2 hover:bg-blue-700 transition-all active:scale-95 disabled:opacity-50"
       >
         {loading ? <Loader2 className="animate-spin" /> : "ENVIAR LINK DE ACESSO"}
