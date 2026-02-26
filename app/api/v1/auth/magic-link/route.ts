@@ -17,28 +17,22 @@ export async function POST (request: NextRequest) {
     const supabase = await createSupabaseServerClient();
     
     const baseUrl = getBaseUrl();
-
     const nextPath = next ?? '/dashboard';
 
-    const extraQueryParams = [
-      ...(securityCode
-        ? [`&security_code=${encodeURIComponent(securityCode)}`]
-        : []
-      ),
-      ...(action
-        ? [`action=${encodeURIComponent(action)}`]
-        : []
-      )
-    ].join('&');
+    // Usar URLSearchParams garante que os & e ? fiquem no lugar certo
+    const params = new URLSearchParams();
+    params.append('next', nextPath);
+    if (securityCode) params.append('security_code', securityCode);
+    if (action) params.append('action', action);
 
-    const { error, data } = await supabase.auth.signInWithOtp({
+    const redirectTo = `${baseUrl}/api/v1/auth/callback?${params.toString()}`;
+
+    const { error } = await supabase.auth.signInWithOtp({
       email,
       options: {
-        emailRedirectTo: `${baseUrl}/api/v1/auth/callback?next=${encodeURIComponent(nextPath)}${extraQueryParams}`,
+        emailRedirectTo: redirectTo,
       },
-    });
-    
-    console.log(data);
+    });    
 
     if (error) {
       console.error('Error on sending magic link:', error);
@@ -59,7 +53,7 @@ export async function POST (request: NextRequest) {
     }
   } catch (err) {
     console.error('Unexpected error on magic link request:', err);
-    return new Response(JSON.stringify({ error: 'Internal Server Error' }), { status: 500 });
+    return NextResponse.json({ error: 'Unexpected error on magic link request' }, { status: 500 });
   }
 
 }
