@@ -105,7 +105,6 @@ export default function ManagePage() {
   }, [codeDigits, params]);
 
   useEffect(() => {
-    console.log('searchParams', searchParams);
     if (searchParams.has('code') && searchParams.get('code')?.length === 6) {
       setCodeDigits(searchParams.get('code')!.toUpperCase().split(''));
     }
@@ -207,7 +206,7 @@ export default function ManagePage() {
             <div className="text-center text-slate-400 text-xs flex flex-row items-start gap-2">
               <Info size={16} /> 
               <span className="text-center text-xs text-slate-400 font-medium">
-                O código de 8 dígitos está presente na embalagem da sua tag.
+                O código de 6 caracteres está presente na embalagem da sua tag.
               </span>
             </div>
             

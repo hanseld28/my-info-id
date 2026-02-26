@@ -1,4 +1,4 @@
-import { generateHashURL, generateSecurityCode } from '@/lib/utils/generator-utils';
+import { generateHashURL, generateScanToken, generateSecurityCode } from '@/lib/utils/generator-utils';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
 
 export async function POST(req: Request) {
@@ -9,29 +9,35 @@ export async function POST(req: Request) {
     
     const { data: existingTags } = await supabase
       .from('tags')
-      .select('hash_url, security_code');
+      .select('hash_url, security_code, scan_token');
 
+    const existingScanTokens = new Set(existingTags?.map(t => t.scan_token) || []);
     const existingHashes = new Set(existingTags?.map(t => t.hash_url) || []);
     const existingSecCodes = new Set(existingTags?.map(t => t.security_code) || []);
 
     const newTags = [];
+    const usedScanTokensInThisBatch = new Set();
     const usedHashesInThisBatch = new Set();
     const usedSecCodesInThisBatch = new Set();
 
     while (newTags.length < quantity) {
+      const scanToken = generateScanToken();
       const hash = generateHashURL();
       const secCode = generateSecurityCode();
 
+      const isScanTokenUsed = existingScanTokens.has(scanToken) || usedScanTokensInThisBatch.has(scanToken);
       const isHashUsed = existingHashes.has(hash) || usedHashesInThisBatch.has(hash);
       const isSecCodeUsed = existingSecCodes.has(secCode) || usedSecCodesInThisBatch.has(secCode);
 
-      if (!isHashUsed && !isSecCodeUsed) {
+      if (!isScanTokenUsed && !isHashUsed && !isSecCodeUsed) {
         newTags.push({
+          scan_token: scanToken,
           hash_url: hash,
           security_code: secCode,
           status: 'pending'
         });
         
+        usedScanTokensInThisBatch.add(scanToken);
         usedHashesInThisBatch.add(hash);
         usedSecCodesInThisBatch.add(secCode);
       }
@@ -43,7 +49,7 @@ export async function POST(req: Request) {
       .select();
 
     if (error) throw error;
-
+    
     return Response.json({ 
       success: true, 
       count: data.length,

@@ -1,8 +1,8 @@
 import { createSupabaseServerClient } from '@/lib/supabase/server';
 import { EmergencyContact } from '@/lib/types/emergency-contact';
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 
-export async function PATCH(request: Request) {
+export async function PATCH(request: NextRequest) {
   try {
     const { hash, security_code, updatedData } = await request.json();
     const supabase = await createSupabaseServerClient();

@@ -1,11 +1,32 @@
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { ConsentLog } from '@/lib/types/consent-log';
 import { EmergencyContact } from '@/lib/types/emergency-contact';
-import { NextResponse } from "next/server";
+import { CURRENT_TERMS_VERSION } from '@/lib/utils/constants';
+import { headers } from 'next/headers';
+import { NextRequest, NextResponse } from "next/server";
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
   try {
-    const { code, target_type, full_name, emergency_contacts, observations } = await request.json();
+    const {
+      code,
+      target_type,
+      full_name,
+      emergency_contacts,
+      observations,
+      terms_accepted
+    } = await request.json();
+
+    if (!terms_accepted) {
+      return NextResponse.json({
+        error: "Você precisa aceitar os termos para ativar a tag e utilizar nossos serviços."
+      }, { status: 400 });
+    }
+
+    const headerList = await headers();
+
     const supabase = await createSupabaseServerClient();
+
+    const { data: { user } } = await supabase.auth.getUser();
 
     const { data: tag, error: tagError } = await supabase
       .from('tags')
@@ -54,13 +75,27 @@ export async function POST(request: Request) {
       .update({ 
         target_type, 
         status: 'active',
-        activated_at: new Date().toISOString() 
+        activated_at: new Date().toISOString(),
+        owner_id: user?.id || null
       })
       .eq('id', tag.id)
       .select()
       .single();
 
-    if (activationError) throw activationError;
+    if (activationError) {
+      throw activationError;
+    }
+
+    await supabase.from('consent_logs')
+      .insert({
+        tag_id: tag.id,
+        owner_id: user?.id,
+        action: 'accepted',
+        term_type: 'lgpd_health_data',
+        version: CURRENT_TERMS_VERSION,
+        ip_address: headerList.get('x-forwarded-for')?.split(',')[0] || 'unknown',
+        user_agent: headerList.get('user-agent'),
+      } as ConsentLog);
 
     return NextResponse.json({ success: true, data: activatedTag });
 

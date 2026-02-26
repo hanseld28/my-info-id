@@ -2,6 +2,7 @@ import Link from 'next/link';
 import LogoutButton from './LogoutButton';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
 import Image from 'next/image';
+import LoginButton from './LoginButton';
 
 export default async function Header() {
   const supabase = await createSupabaseServerClient();
@@ -24,14 +25,24 @@ export default async function Header() {
         </Link>
 
         <nav className="flex items-center gap-4">
-          <Link 
-            href="/activate" 
-            className="text-xs font-medium text-slate-600 hover:text-blue-600 transition-colors px-3 py-2 rounded-md hover:bg-blue-50"
-          >
-            ATIVAR TAG
-          </Link>
+          {!user && (
+            <Link 
+              href="/activate"
+              className="text-xs font-medium text-slate-600 hover:text-blue-600 transition-colors px-3 py-2 rounded-md hover:bg-blue-50"
+            >
+              ATIVAR TAG
+            </Link>
+          )}
 
-          {user ? (<LogoutButton />) : (<></>)}
+          {user && (
+            <Link 
+              href="/dashboard" 
+              className="text-xs font-medium text-slate-600 hover:text-blue-600 transition-colors px-3 py-2 rounded-md hover:bg-blue-50"
+            >
+              DASHBOARD
+            </Link>
+          )}
+          {user ? (<LogoutButton />) : (<LoginButton />)}
           
         </nav>
       </div>

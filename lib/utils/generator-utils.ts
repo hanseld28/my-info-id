@@ -1,4 +1,11 @@
+import { customAlphabet } from 'nanoid';
+
 const SECURE_CHARS = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789';
+
+export const generateScanToken = () => {
+  const nanoid = customAlphabet(SECURE_CHARS, 14);
+  return nanoid().toLowerCase();
+};
 
 const generateSecureString = (length: number): string => {
   const array = new Uint8Array(length);

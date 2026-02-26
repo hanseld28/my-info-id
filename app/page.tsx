@@ -70,17 +70,6 @@ export default function HomePage() {
       <HowItWorks />
       
       <FAQ />
-
-      <footer className="w-full py-12 px-6 border-t border-white/10 text-center">
-        <div className="max-w-6xl mx-auto">
-          <p className="text-blue-200 text-sm font-medium">
-            &copy; {new Date().getFullYear()} <span className="text-white">Meu Info ID</span>. Todos os direitos reservados.
-          </p>
-          <p className="mt-2 text-blue-300/60 text-xs">
-            Tecnologia NFC para segurança e conectividade.
-          </p>
-        </div>
-      </footer>
     </main>
   );
 }
