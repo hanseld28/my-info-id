@@ -16,12 +16,16 @@ export async function POST(request: NextRequest) {
 
   const { data: tag, error: findError } = await supabase
     .from('tags')
-    .select('id, owner_id')
+    .select('id, status, owner_id')
     .eq('security_code', securityCode.toUpperCase())
     .single()
 
   if (findError || !tag) {
     return NextResponse.json({ error: 'Código inválido ou tag já vinculada.' }, { status: 404 })
+  }
+
+  if (tag.status === 'pending') {
+    return NextResponse.json({ error: 'Esta tag ainda não foi ativada.' }, { status: 400 })
   }
 
   if (tag.owner_id !== null && tag.owner_id === user.id) {

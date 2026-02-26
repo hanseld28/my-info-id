@@ -3,18 +3,29 @@ import { useState, useRef, useEffect, useCallback } from 'react';
 import { X, ShieldCheck, Loader2, Link } from 'lucide-react';
 
 interface Props {
+  securityCode?: string;
   onSuccess: () => void;
 }
 
-export default function BindTagModal({ onSuccess }: Props) {
+export default function BindTagModal({ securityCode, onSuccess }: Props) {
   const [isOpen, setIsOpen] = useState(false);
   const [isBinding, setIsBinding] = useState(false);
   const [codeDigits, setCodeDigits] = useState(['', '', '', '', '', '']);
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
 
   useEffect(() => {
-    if (!isOpen) setCodeDigits(['', '', '', '', '', '']);
-  }, [isOpen]);
+    if (securityCode && securityCode?.length === 6) {
+      setIsOpen(true);
+      
+      setTimeout(() => {
+        setCodeDigits(securityCode!.toUpperCase().split(''));
+      
+        if (inputRefs.current) {
+          inputRefs.current[inputRefs?.current.length - 1]?.focus();
+        }
+      }, 300);
+    }
+  }, [securityCode])
 
   const handleCodeChange = (value: string, index: number) => {
     const val = value.toUpperCase().slice(-1).replace(/[^A-Z0-9]/g, '');
@@ -46,6 +57,11 @@ export default function BindTagModal({ onSuccess }: Props) {
       inputRefs.current[nextIndex]?.focus();
     }
   };
+
+  const handleClose = useCallback(async () => {
+    setIsOpen(false);
+    setCodeDigits(['', '', '', '', '', '']);
+  }, []);
 
   const handleSubmit = useCallback(async () => {
     const fullCode = codeDigits.join('');
@@ -90,7 +106,7 @@ export default function BindTagModal({ onSuccess }: Props) {
         <div className="fixed inset-0 z-100 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-200">
           <div className="relative bg-white w-full max-w-md rounded-[2.5rem] shadow-2xl p-8 animate-in zoom-in-95 duration-200">
             <button 
-              onClick={() => setIsOpen(false)}
+              onClick={handleClose}
               className="absolute top-6 right-6 p-2 text-slate-400 hover:bg-slate-100 rounded-full transition-colors"
             >
               <X size={24} />
@@ -117,7 +133,7 @@ export default function BindTagModal({ onSuccess }: Props) {
                   value={digit}
                   onChange={(e) => handleCodeChange(e.target.value, index)}
                   onKeyDown={(e) => handleKeyDown(e, index)}
-                  className="w-full h-16 text-center text-2xl font-black border-2 border-slate-100 rounded-2xl outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-50 transition-all bg-slate-50 uppercase"
+                  className="w-full h-16 text-center text-2xl font-black border-2 border-slate-100 rounded-xl outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-50 transition-all bg-slate-50 uppercase"
                 />
               ))}
             </div>

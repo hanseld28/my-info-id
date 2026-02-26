@@ -50,10 +50,17 @@ export async function proxy(request: NextRequest) {
     }
 
     if (request.nextUrl.pathname.startsWith('/dashboard')) {
-
         if (!user) {
             const url = request.nextUrl.clone();
             url.pathname = '/login';
+            return NextResponse.redirect(url);
+        }
+    }
+
+    if (request.nextUrl.pathname.startsWith('/login')) {    
+        if (user) {
+            const url = request.nextUrl.clone();
+            url.pathname = '/dashboard';
             return NextResponse.redirect(url);
         }
     }
@@ -62,5 +69,9 @@ export async function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/backoffice/panel/:path*'],
+  matcher: [
+    '/login:path*',
+    '/backoffice/panel/:path*',
+    '/dashboard/:path*'
+],
 };

@@ -105,7 +105,6 @@ export default function ManagePage() {
   }, [codeDigits, params]);
 
   useEffect(() => {
-    console.log('searchParams', searchParams);
     if (searchParams.has('code') && searchParams.get('code')?.length === 6) {
       setCodeDigits(searchParams.get('code')!.toUpperCase().split(''));
     }
