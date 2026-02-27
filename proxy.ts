@@ -8,11 +8,14 @@ export async function proxy(request: NextRequest) {
     const { pathname } = request.nextUrl;
     const isProduction = process.env.NODE_ENV === 'production';
 
-    const isPublicAsset = pathname.startsWith('/_next') || 
-                            pathname.startsWith('/static') || 
-                            pathname.startsWith('/api') ||
-                            pathname === '/favicon.ico' ||
-                            pathname === '/coming-soon';
+    const isPublicAsset = (
+        pathname.startsWith('/_next') 
+        || pathname.startsWith('/static') 
+        || pathname.startsWith('/api')
+        || pathname === '/favicon.ico'
+        || pathname === '/coming-soon'
+        || /\.(?:svg|png|jpg|jpeg|gif|webp|ico|css|js|woff2?|ttf)$/i.test(pathname)
+    );
 
     const forwarded = request.headers.get('x-forwarded-for');
     const clientIp = forwarded ? forwarded.split(',')[0] : null;
