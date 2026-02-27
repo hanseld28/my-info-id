@@ -4,6 +4,8 @@ import { createSupabaseServerClient } from '@/lib/supabase/server';
 import Image from 'next/image';
 import LoginButton from './LoginButton';
 
+const isProduction = process.env.NODE_ENV === 'production';
+
 export default async function Header() {
   const supabase = await createSupabaseServerClient();
 
@@ -25,25 +27,28 @@ export default async function Header() {
         </Link>
 
         <nav className="flex items-center gap-4">
-          {!user && (
-            <Link 
-              href="/activate"
-              className="text-xs font-medium text-slate-600 hover:text-blue-600 transition-colors px-3 py-2 rounded-md hover:bg-blue-50"
-            >
-              ATIVAR TAG
-            </Link>
-          )}
+          {!isProduction && (
+            <>
+              {!user && (
+                <Link 
+                  href="/activate"
+                  className="text-xs font-medium text-slate-600 hover:text-blue-600 transition-colors px-3 py-2 rounded-md hover:bg-blue-50"
+                >
+                  ATIVAR TAG
+                </Link>
+              )}
 
-          {user && (
-            <Link 
-              href="/dashboard" 
-              className="text-xs font-medium text-slate-600 hover:text-blue-600 transition-colors px-3 py-2 rounded-md hover:bg-blue-50"
-            >
-              DASHBOARD
-            </Link>
+              {user && (
+                <Link 
+                  href="/dashboard" 
+                  className="text-xs font-medium text-slate-600 hover:text-blue-600 transition-colors px-3 py-2 rounded-md hover:bg-blue-50"
+                >
+                  DASHBOARD
+                </Link>
+              )}
+              {user ? (<LogoutButton />) : (<LoginButton />)}
+            </>
           )}
-          {user ? (<LogoutButton />) : (<LoginButton />)}
-          
         </nav>
       </div>
     </header>

@@ -3,6 +3,21 @@ import type { NextRequest } from 'next/server';
 import { createServerClient } from '@supabase/ssr';
 
 export async function proxy(request: NextRequest) {
+    const { pathname } = request.nextUrl;
+    const isProduction = process.env.NODE_ENV === 'production';
+
+    const isPublicAsset = pathname.startsWith('/_next') || 
+                            pathname.startsWith('/static') || 
+                            pathname.startsWith('/api') ||
+                            pathname === '/favicon.ico' ||
+                            pathname === '/coming-soon';
+
+    if (isProduction) {
+        if (!isPublicAsset && pathname !== '/') {
+        return NextResponse.redirect(new URL('/coming-soon', request.url));
+        }
+    }
+
     let response = NextResponse.next({
         request: {
           headers: request.headers,
