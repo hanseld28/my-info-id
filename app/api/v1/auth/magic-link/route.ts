@@ -19,14 +19,21 @@ export async function POST (request: NextRequest) {
     const baseUrl = getBaseUrl();
     const nextPath = next ?? '/dashboard';
 
-    // Usar URLSearchParams garante que os & e ? fiquem no lugar certo
     const params = new URLSearchParams();
     params.append('next', nextPath);
-    if (securityCode) params.append('security_code', securityCode);
-    if (action) params.append('action', action);
+
+    if (securityCode) {
+      params.append('security_code', securityCode);
+    }
+    
+    if (action) {
+      params.append('action', action);
+    }
 
     const redirectTo = `${baseUrl}/api/v1/auth/callback?${params.toString()}`;
 
+    console.log("Constructed redirect URL for magic link:", redirectTo);
+    
     const { error } = await supabase.auth.signInWithOtp({
       email,
       options: {
@@ -49,6 +56,7 @@ export async function POST (request: NextRequest) {
         { status: error.status }
       );
     } else {
+      console.log('Magic link sent successfully to:', email);
       return response;
     }
   } catch (err) {
