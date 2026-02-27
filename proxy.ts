@@ -18,7 +18,12 @@ export async function proxy(request: NextRequest) {
     );
 
     const forwarded = request.headers.get('x-forwarded-for');
+
+    console.log(`Incoming request for ${pathname} from IP: ${forwarded}`);
+
     const clientIp = forwarded ? forwarded.split(',')[0] : null;
+
+    console.log(`Client IP determined as: ${clientIp}`);
 
     const isIpAuthorized = WHITELIST_IPS.includes(clientIp || '');
     
