@@ -17,13 +17,14 @@ export async function proxy(request: NextRequest) {
         || /\.(?:svg|png|jpg|jpeg|gif|webp|ico|css|js|woff2?|ttf)$/i.test(pathname)
     );
 
-    const forwarded = request.headers.get('x-forwarded-for');
+    const clientIp = (
+        request.headers.get('cf-connecting-ip')
+        || (request.headers.get('x-forwarded-for')?.split(',')[0].trim())
+        || '127.0.0.1'
+    );
 
-    console.log(`Incoming request for ${pathname} from IP: ${forwarded}`);
-
-    const clientIp = forwarded ? forwarded.split(',')[0] : null;
-
-    console.log(`Client IP determined as: ${clientIp}`);
+    console.log(`Detected IP (CF): ${request.headers.get('cf-connecting-ip')}`);
+    console.log(`Final Detected IP: ${clientIp}`);
 
     const isIpAuthorized = WHITELIST_IPS.includes(clientIp || '');
     
