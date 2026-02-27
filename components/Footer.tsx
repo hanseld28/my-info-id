@@ -1,6 +1,8 @@
 import { Instagram, Mail, MessageCircle } from 'lucide-react';
 import Link from 'next/link';
 
+const WHATSAPP_CONTACT_MESSAGE_CODE = process.env.NEXT_PUBLIC_WHATSAPP_CONTACT_MESSAGE_CODE || "";
+
 export default function Footer() {
   return (
     <footer className="w-full py-8 px-6 border-t border-slate-100 bg-white">
@@ -26,7 +28,7 @@ export default function Footer() {
           <a href="https://instagram.com/meuinfoid" target="_blank" className="text-slate-300 hover:text-pink-500 transition-colors">
             <Instagram size={18} />
           </a>
-          <a href="https://wa.me/5511999999999" target="_blank" className="text-slate-300 hover:text-green-500 transition-colors">
+          <a href={`https://wa.me/message/${WHATSAPP_CONTACT_MESSAGE_CODE}`} target="_blank" className="text-slate-300 hover:text-green-500 transition-colors">
             <MessageCircle size={18} />
           </a>
           <a href="mailto:suporte@meuinfoid.com.br" className="text-slate-300 hover:text-blue-500 transition-colors">
