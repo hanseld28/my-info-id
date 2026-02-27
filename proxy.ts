@@ -15,7 +15,7 @@ export async function proxy(request: NextRequest) {
                             pathname === '/coming-soon';
 
     const forwarded = request.headers.get('x-forwarded-for');
-    const clientIp = forwarded ? forwarded.split(',')[0] : '127.0.0.1';;
+    const clientIp = forwarded ? forwarded.split(',')[0] : null;
 
     const isIpAuthorized = WHITELIST_IPS.includes(clientIp || '');
     
@@ -95,5 +95,7 @@ export async function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/((?!api|_next/static|_next/image|favicon.ico).*)'],
+    matcher: [
+        '/((?!api|_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp|pdf|txt|css|js)$).*)',
+    ],
 };
