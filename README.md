@@ -10,7 +10,7 @@ O sistema foi concebido para validar a ideia de identificação dinâmica. Difer
 
 ### 👥 Perfis de Acesso
 - **Viewer (Público):** Visualização rápida dos dados da tag através de um `hash` único na URL.
-- **Owner (Dono):** Ativação de tags novas e edição de dados existentes mediante o uso de um código de segurança de 6 caracteres.
+- **Owner (Dono):** Ativação de tags novas e edição de dados existentes mediante o uso de um código de segurança.
 - **Admin:** Controle de produção, geração de lotes de códigos e exportação de dados para logística.
 
 ---
