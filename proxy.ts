@@ -2,6 +2,8 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import { createServerClient } from '@supabase/ssr';
 
+const WHITELIST_IPS = process.env.WHITELIST_IPS?.split(',').map(ip => ip.trim()) || [];
+
 export async function proxy(request: NextRequest) {
     const { pathname } = request.nextUrl;
     const isProduction = process.env.NODE_ENV === 'production';
@@ -12,7 +14,16 @@ export async function proxy(request: NextRequest) {
                             pathname === '/favicon.ico' ||
                             pathname === '/coming-soon';
 
-    if (isProduction) {
+    const forwarded = request.headers.get('x-forwarded-for');
+    const clientIp = forwarded ? forwarded.split(',')[0] : '127.0.0.1';;
+
+    const isIpAuthorized = WHITELIST_IPS.includes(clientIp || '');
+    
+    if (isProduction && !isIpAuthorized) {
+        console.log(`Acesso bloqueado para o IP: ${clientIp}`);
+    }
+
+    if (isProduction && !isIpAuthorized) {
         if (!isPublicAsset && pathname !== '/') {
         return NextResponse.redirect(new URL('/coming-soon', request.url));
         }
@@ -84,9 +95,5 @@ export async function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: [
-    '/login:path*',
-    '/backoffice/panel/:path*',
-    '/dashboard/:path*'
-],
+  matcher: ['/((?!api|_next/static|_next/image|favicon.ico).*)'],
 };

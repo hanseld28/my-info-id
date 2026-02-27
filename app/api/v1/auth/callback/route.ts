@@ -30,6 +30,8 @@ export async function GET(request: NextRequest) {
         ? `${origin}${next}?${queryParams.join('&')}`
         : `${origin}${next}`;
 
+      console.log('Auth callback successful, redirecting to:', finalUrl);
+
       return NextResponse.redirect(finalUrl);
     }
     
