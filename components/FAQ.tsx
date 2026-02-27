@@ -10,7 +10,7 @@ export default function FAQ() {
     },
     {
       question: "É seguro? Alguém pode roubar os meus dados?",
-      answer: "A Tag apenas armazena um link encriptado. Os dados pessoais ficam seguros no nosso servidor e só podem ser alterados por quem possui o código de segurança de 6 caracteres."
+      answer: "A Tag apenas armazena um link encriptado. Os dados pessoais ficam seguros no nosso servidor e só podem ser alterados por quem possui o código de segurança."
     },
     {
       question: "Preciso instalar alguma aplicação (App)?",
