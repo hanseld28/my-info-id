@@ -5,7 +5,7 @@ export { SerwistProvider } from "@serwist/turbopack/react";
 
 export function PWAProvider({ children }: { children: React.ReactNode }) {
   return (
-    <SerwistProvider swUrl="/sw.js"> 
+    <SerwistProvider swUrl="/serwist/sw.js"> 
       {children}
     </SerwistProvider>
   );
