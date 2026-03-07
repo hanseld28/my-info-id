@@ -8,6 +8,7 @@ import Link from 'next/link';
 import EmergencyContactManager from '@/components/EmergencyContactManager';
 import { Contact } from '@/lib/types/emergency-contact';
 import { useSearchParams } from 'next/navigation';
+import { toast } from 'sonner';
 
 export default function ActivateFormContent() {
   const searchParams = useSearchParams();
@@ -87,13 +88,13 @@ export default function ActivateFormContent() {
         setStep(2);
       } else {
         const err = await res.json();
-        alert(err.error || "Código inválido ou já utilizado.");
+        toast.error(err.error || "Código inválido ou já utilizado.");
         setCodeDigits(new Array(6).fill(""));
         inputRefs.current[0]?.focus();
       }
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (_error) {
-      alert("Não foi possível validar o código no momento. Tente novamente mais tarde.");
+      toast.error("Não foi possível validar o código no momento. Tente novamente mais tarde.");
       setCodeDigits(new Array(6).fill(""));
       inputRefs.current[0]?.focus();
     } finally {
@@ -105,7 +106,8 @@ export default function ActivateFormContent() {
     e.preventDefault();
 
     if (!termsAccepted) {
-      return alert("Você precisa aceitar os termos para ativar a tag e utilizar nossos serviços.");
+      toast.warning("Você precisa aceitar os termos para ativar a tag e utilizar nossos serviços.");
+      return;
     }
 
     const data = {
@@ -115,7 +117,7 @@ export default function ActivateFormContent() {
     };
 
     if (data.emergency_contacts.length === 0) {
-      alert("Adicione pelo menos um contato de emergência!");
+      toast.warning("Adicione pelo menos um contato de emergência!");
       return;
     }
     
@@ -132,7 +134,7 @@ export default function ActivateFormContent() {
       setLoading(false);
     } else {
       const err = await res.json();
-      alert(err.error);
+      toast.error(err.error || "Erro ao ativar tag.");
       setLoading(false);
     }
   };

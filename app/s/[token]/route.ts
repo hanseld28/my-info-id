@@ -25,7 +25,7 @@ export async function GET(
     .from('tags')
     .select('id, hash_url, status')
     .eq('scan_token', safeToken)
-    .single();
+    .maybeSingle();
 
   if (error || !tag) {
     return NextResponse.redirect(new URL('/404', request.url));

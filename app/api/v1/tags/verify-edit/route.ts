@@ -44,7 +44,7 @@ export async function GET(request: NextRequest) {
     `)
     .eq('hash_url', hash)
     .eq('security_code', code)
-    .single();
+    .maybeSingle();
 
   if (error || !data) {
     return NextResponse.json(

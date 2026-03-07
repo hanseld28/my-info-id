@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { MapPin, Loader2 } from 'lucide-react';
+import { toast } from 'sonner';
 
 interface ShareLocationProps {
   phone: string;
@@ -22,7 +23,7 @@ export default function ShareLocation({ phone, ownerName }: ShareLocationProps) 
 
   const handleShare = () => {
     if (!navigator.geolocation) {
-      alert("O seu navegador não suporta geolocalização.");
+      toast.warning("O seu navegador não suporta geolocalização.");
       return;
     }
 
@@ -42,9 +43,10 @@ export default function ShareLocation({ phone, ownerName }: ShareLocationProps) 
         setWhatsappUrl(url);
         setLoading(false);
       },
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       (_error) => {
         setLoading(false);
-        alert("Não foi possível obter a sua localização. Por favor, verifique as permissões do seu GPS.");
+        toast.error("Não foi possível obter a sua localização. Por favor, verifique as permissões do seu GPS.");
       },
       { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
     );

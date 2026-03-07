@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { getBaseUrl } from '@/lib/utils/get-url';
 import { QRCodeSVG } from 'qrcode.react';
 import { QrCode, Download, X, Copy, ExternalLink } from 'lucide-react';
+import { toast } from 'sonner';
 
 interface Props {
   hash: string;
@@ -93,7 +94,7 @@ export default function TagQRCode({ hash, id }: Props) {
                 <button
                   onClick={() => {
                     navigator.clipboard.writeText(url);
-                    alert('Link copiado!');
+                    toast.info('Link copiado!');
                   }}
                   className="w-full flex items-center justify-center gap-2 bg-slate-100 text-slate-600 py-4 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-slate-200 transition-all"
                 >
