@@ -18,7 +18,7 @@ export async function POST(request: NextRequest) {
     .from('tags')
     .select('id, status, owner_id')
     .eq('security_code', securityCode.toUpperCase())
-    .single()
+    .maybeSingle();
 
   if (findError || !tag) {
     return NextResponse.json({ error: 'Código inválido ou tag já vinculada.' }, { status: 404 })

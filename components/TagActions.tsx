@@ -24,7 +24,7 @@ export function TagActions({ tag }: { tag: { hash_url: string; security_code: st
         <div className="flex items-center gap-1">
           <button
             onClick={handleCopy}
-            className="flex items-center gap-2 bg-slate-50 hover:bg-slate-100 px-2 py-1 rounded-lg transition-colors group/copy"
+            className="flex items-center gap-2 bg-slate-50 hover:bg-slate-100 px-2 py-1 cursor-pointer rounded-lg transition-colors group/copy"
             title="Clique para copiar"
           >
             <code className="text-sm font-mono font-bold text-slate-600">
@@ -39,7 +39,7 @@ export function TagActions({ tag }: { tag: { hash_url: string; security_code: st
           
           <button 
             onClick={() => setShowCode(!showCode)}
-            className="p-1 text-slate-400 hover:text-blue-600 transition-colors"
+            className="p-1 cursor-pointer text-slate-400 hover:text-blue-600 transition-colors"
           >
             {showCode ? <EyeOff size={16} /> : <Eye size={16} />}
           </button>

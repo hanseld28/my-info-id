@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { createSupabaseComponentClient } from '@/lib/supabase/client';
+import { toast } from 'sonner';
 
 export default function BackofficeLoginPage() {
   const [email, setEmail] = useState('');
@@ -17,7 +18,7 @@ export default function BackofficeLoginPage() {
     const { error } = await supabase.auth.signInWithPassword({ email, password });
 
     if (error) {
-      alert("Erro no login: " + error.message);
+      toast.error("Erro no login: " + error.message);
     } else {
       router.push('/backoffice/panel');
       router.refresh();
@@ -30,12 +31,14 @@ export default function BackofficeLoginPage() {
       <form onSubmit={handleLogin} className="bg-white p-8 rounded-xl shadow-md w-full max-w-sm">
         <h1 className="text-2xl font-bold mb-6 text-center text-slate-800">Acesso Backoffice</h1>
         <input 
-          type="email" placeholder="E-mail" 
+          type="email"
+          placeholder="E-mail" 
           className="w-full p-3 border rounded mb-4 outline-none focus:ring-2 focus:ring-blue-500"
           onChange={e => setEmail(e.target.value)}
         />
         <input 
-          type="password" placeholder="Senha" 
+          type="password"
+          placeholder="Senha" 
           className="w-full p-3 border rounded mb-6 outline-none focus:ring-2 focus:ring-blue-500"
           onChange={e => setPassword(e.target.value)}
         />

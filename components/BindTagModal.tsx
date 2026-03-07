@@ -1,6 +1,7 @@
 'use client';
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { X, ShieldCheck, Loader2, Link } from 'lucide-react';
+import { toast } from 'sonner';
 
 interface Props {
   securityCode?: string;
@@ -81,13 +82,13 @@ export default function BindTagModal({ securityCode, onSuccess }: Props) {
         onSuccess();
       } else {
         const error = await res.json();
-        alert(error.error || 'Código inválido.');
+        toast.error(error.error || 'Código inválido.');
         setCodeDigits(['', '', '', '', '', '']);
         inputRefs.current[0]?.focus();
       }
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (_err) {
-      alert('Erro na ligação ao servidor.');
+      toast.error('Erro na ligação ao servidor.');
     } finally {
       setIsBinding(false);
     }

@@ -1,5 +1,4 @@
 import { Metadata } from 'next';
-import { headers } from 'next/headers';
 import { notFound } from 'next/navigation';
 import { pendingTagActivation } from '@/errors/tag-error-templates';
 import { TARGET_CONFIG } from '@/lib/utils/constants';
@@ -9,34 +8,34 @@ import { calculateAge } from '@/lib/utils/date-utils';
 import { EmergencyContact } from '@/lib/types/emergency-contact';
 import HealthCard from '@/components/HealthCard';
 import EmergencyContactView from '@/components/EmergencyContactView';
+import { getBaseUrl } from '@/lib/utils/get-url';
+
+const BASE_URL = getBaseUrl();
 
 interface ViewerProps {
-  siteUrl: string;
-  params: { hash: string };
+  params: Promise<{ hash: string }>;
 }
-
-const getData = async () => {
-  const headersMap = await headers();
-
-  const host = headersMap.get('host');
-  const protocol = 'http';
-  const siteUrl = `${protocol}://${host}`;
-
-  return {
-    siteUrl,
-  };
-};
 
 export const generateMetadata = async ({ params }: ViewerProps): Promise<Metadata> =>{
   const { hash } = await params;
-  return { title: `Informações da Tag - ${hash}` };
+
+  const safeHash = hash.toUpperCase();
+
+  return { 
+    title: 'Tag - Acesso Público',
+    description: `Visualize as informações da tag NFC ${safeHash}.`,
+    metadataBase: new URL(BASE_URL),
+    openGraph: {
+      title: 'Tag - Acesso Público',
+      description: `Visualize as informações da tag NFC ${safeHash}.`
+    }
+  };
 }
 
 export default async function ViewerPage({ params }: ViewerProps) {
   const { hash } = await params;
-  const { siteUrl } = await getData();
 
-  const response = await fetch(`${siteUrl}/api/v1/tags/view/${hash}`, {
+  const response = await fetch(`${BASE_URL}/api/v1/tags/view/${hash}`, {
     cache: 'no-store'
   });
 

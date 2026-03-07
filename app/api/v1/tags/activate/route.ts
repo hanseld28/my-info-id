@@ -33,7 +33,7 @@ export async function POST(request: NextRequest) {
       .select('id')
       .eq('security_code', code)
       .eq('status', 'pending')
-      .single();
+      .maybeSingle();
 
     if (tagError || !tag) {
       return NextResponse.json({ error: "Código inválido ou tag já ativada" }, { status: 400 });
@@ -47,7 +47,7 @@ export async function POST(request: NextRequest) {
         observations: observations || null,
       })
       .select('id')
-      .single();
+      .maybeSingle();
 
     if (insertError || !newTagData) {
       console.error('Insert Tag Data Error:', insertError);
@@ -80,7 +80,7 @@ export async function POST(request: NextRequest) {
       })
       .eq('id', tag.id)
       .select()
-      .single();
+      .maybeSingle();
 
     if (activationError) {
       throw activationError;

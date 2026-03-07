@@ -12,7 +12,7 @@ export async function PATCH(request: NextRequest) {
       .select('id')
       .eq('hash_url', hash)
       .eq('security_code', security_code)
-      .single();
+      .maybeSingle();
 
     if (tagError || !tag) {
       return NextResponse.json({ error: "Acesso negado." }, { status: 401 });
@@ -28,7 +28,7 @@ export async function PATCH(request: NextRequest) {
       })
       .eq('tag_id', tag.id)
       .select('id')
-      .single();
+      .maybeSingle();
 
     if (healthError || !tagDataRecord) throw healthError;
 

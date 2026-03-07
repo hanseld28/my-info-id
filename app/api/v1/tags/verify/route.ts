@@ -18,7 +18,7 @@ export async function GET(request: NextRequest) {
     .from('tags')
     .select('id, status')
     .eq('security_code', code)
-    .single();
+    .maybeSingle();
 
   if (error || !tag) {
     return NextResponse.json(

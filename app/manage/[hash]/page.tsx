@@ -9,6 +9,7 @@ import EmergencyContactManager from '@/components/EmergencyContactManager';
 import { Contact } from '@/lib/types/emergency-contact';
 import HealthCardInput from '@/components/inputs/HealthCardInput';
 import BloodTypeInput from '@/components/inputs/BloodTypeInput';
+import { toast } from 'sonner';
 
 export default function ManagePage() {
   const params = useParams();
@@ -92,13 +93,13 @@ export default function ManagePage() {
         setStep(2);
       } else {
         const err = await res.json();
-        alert(err.error || "Código de segurança incorreto.");
+        toast.error(err.error || "Código de segurança incorreto.");
         setCodeDigits(new Array(6).fill(""));
         inputRefs.current[0]?.focus();
       }
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (_error) {
-      alert("Erro ao validar acesso.");
+      toast.error("Erro ao validar acesso.");
     } finally {
       setLoading(false);
     }
@@ -120,7 +121,7 @@ export default function ManagePage() {
     e.preventDefault();
   
     if (form.emergency_contacts.length === 0) {
-      alert("Erro: Você precisa adicionar pelo menos um contato de emergência para que a tag seja útil.");
+      toast.error("Você precisa adicionar pelo menos um contato de emergência para que a tag seja útil.");
       return;
     }
 
@@ -129,7 +130,7 @@ export default function ManagePage() {
     );
 
     if (!isAllContactsFilled) {
-      alert("Erro: Preencha todos os campos obrigatórios corretamente para os contatos adicionados.");
+      toast.error("Preencha todos os campos obrigatórios corretamente para os contatos adicionados.");
       return;
     }
 
@@ -157,11 +158,11 @@ export default function ManagePage() {
     });
 
     if (res.ok) {
-      alert("Dados atualizados!");
+      toast.success("Dados atualizados!");
       router.push(`/${params.hash}`);
     } else {
       const err = await res.json();
-      alert(err.error);
+      toast.error(err.error || "Erro ao atualizar dados.");
     }
     setLoading(false);
   };

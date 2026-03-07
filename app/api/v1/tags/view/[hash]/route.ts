@@ -33,7 +33,7 @@ export async function GET(req: Request, { params }: { params: Promise<{ hash: st
       )
     `)
     .eq('hash_url', hash)
-    .single();
+    .maybeSingle();
 
   if (error || !data) {
     console.log(error)
