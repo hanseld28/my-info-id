@@ -20,8 +20,11 @@ export const CONSENT_TERMS_TYPE: Record<string, string> = {
 };
 
 export const TAG_STATUS_TYPE_MAP: Record<string, string> = {
-  pending: 'Pendente',
+  generated: 'Gerada',
+  pending_activation: 'Pendente de Ativação',
   active: 'Ativa',
+  blocked: 'Bloqueada',
+  inactive: 'Inativa'
 };
 
 export const TARGET_TYPE_LABELS: Record<string, string> = {

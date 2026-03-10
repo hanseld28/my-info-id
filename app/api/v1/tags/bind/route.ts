@@ -24,7 +24,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Código inválido ou tag já vinculada.' }, { status: 404 })
   }
 
-  if (tag.status === 'pending') {
+  if (tag.status === 'pending_activation') {
     return NextResponse.json({ error: 'Esta tag ainda não foi ativada.' }, { status: 400 })
   }
 

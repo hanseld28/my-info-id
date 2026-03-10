@@ -34,7 +34,7 @@ export async function POST(req: Request) {
           scan_token: scanToken,
           hash_url: hash,
           security_code: secCode,
-          status: 'pending'
+          status: 'generated'
         });
         
         usedScanTokensInThisBatch.add(scanToken);

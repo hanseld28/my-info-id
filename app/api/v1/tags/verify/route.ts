@@ -27,7 +27,7 @@ export async function GET(request: NextRequest) {
     );
   }
 
-  if (tag.status !== 'pending') {
+  if (tag.status !== 'pending_activation') {
     return NextResponse.json(
       { error: 'Esta tag já foi ativada anteriormente.' },
       { status: 400 }

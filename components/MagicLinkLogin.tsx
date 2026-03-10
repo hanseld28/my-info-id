@@ -7,8 +7,11 @@ import SecurityCodeModal from './SecurityCodeModal';
 import { StatusType } from '@/lib/types/tag';
 
 const StatusTagToActionPathMap: Record<StatusType, string> = {
+  generated: '',
+  pending_activation: '/activate',
   active: '/dashboard',
-  pending: '/activate'
+  blocked: '/dashboard',
+  inactive: '/dashboard',
 };
 
 export default function MagicLinkLogin() {

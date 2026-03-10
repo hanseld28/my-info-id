@@ -32,7 +32,7 @@ export async function POST(request: NextRequest) {
       .from('tags')
       .select('id')
       .eq('security_code', code)
-      .eq('status', 'pending')
+      .eq('status', 'pending_activation')
       .maybeSingle();
 
     if (tagError || !tag) {

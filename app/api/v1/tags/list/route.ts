@@ -8,7 +8,7 @@ export async function GET(request: NextRequest) {
   const supabase = await createSupabaseServerClient();
   let query = supabase.from('tags').select('*').order('created_at', { ascending: false });
 
-  if (filter === 'pending') query = query.eq('status', 'pending');
+  if (filter === 'pending_activation') query = query.eq('status', 'pending_activation');
   if (filter === 'active') query = query.eq('status', 'active');
 
   const { data, error } = await query;

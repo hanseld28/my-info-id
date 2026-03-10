@@ -113,7 +113,7 @@ export default function BackofficePanelPage() {
 
       <div className="flex justify-between items-center mb-6">
         <div className="flex gap-2">
-          {['all', 'pending', 'active'].map((f) => (
+          {['all', 'pending_activation', 'active'].map((f) => (
             <button
               key={f}
               onClick={() => setFilter(f)}
@@ -123,7 +123,7 @@ export default function BackofficePanelPage() {
                 : 'bg-white text-slate-600 border border-slate-200 hover:border-slate-300'
               }`}
             >
-              {f === 'all' ? 'Todas' : f === 'pending' ? 'Pendentes' : 'Ativadas'}
+              {f === 'all' ? 'Todas' : f === 'pending_activation' ? 'Pendentes' : 'Ativadas'}
             </button>
           ))}
         </div>
@@ -175,7 +175,7 @@ export default function BackofficePanelPage() {
                   </td>
                   <td className="px-6 py-4 text-right">
                     <span className={`px-2 py-1 text-[10px] font-black rounded border ${
-                      tag.status === 'pending' 
+                      tag.status === 'pending_activation' 
                       ? 'bg-amber-50 text-amber-600 border-amber-200' 
                       : 'bg-emerald-50 text-emerald-600 border-emerald-200'
                     }`}>
