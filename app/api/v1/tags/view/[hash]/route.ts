@@ -40,7 +40,7 @@ export async function GET(req: Request, { params }: { params: Promise<{ hash: st
     return Response.json({ error: "Tag não encontrada" }, { status: 404 });
   }
 
-  if (data.status === 'pending') {
+  if (data.status === 'pending_activation') {
     return Response.json({ error: "Tag ainda não foi ativada pelo proprietário" }, { status: 403 });
   }
 
@@ -50,6 +50,7 @@ export async function GET(req: Request, { params }: { params: Promise<{ hash: st
       success: true,
       data: {
         ...tagData,
+        status: data.status,
         target_type: data.target_type,
         emergency_contacts: tagData.emergency_contacts || []
       }

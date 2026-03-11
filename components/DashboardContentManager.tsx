@@ -63,7 +63,7 @@ export default function DashboardContentManager() {
   }), [searchParams]);
 
   return (
-    <div className="p-2 max-w-5xl mx-auto">
+    <div className="p-2 max-w-6xl mx-auto">
       {loading && <LoadingOverlay message={loadingMessage} />}
 
       <header className="bg-white border-b border-slate-100 px-6 py-8">

@@ -1,7 +1,7 @@
 import { EmergencyContact } from './emergency-contact';
 import { TagData } from './tag-data';
 
-export type StatusType = 'pending' | 'active';
+export type StatusType = 'generated' | 'pending_activation' | 'active' | 'blocked' | 'inactive';
 
 export type TargetType = 'pet' | 'child' | 'elderly' | 'pcd' | 'adult' | 'other';
 
