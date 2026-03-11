@@ -1,6 +1,4 @@
 import { Metadata } from 'next';
-import { notFound } from 'next/navigation';
-import { pendingTagActivation } from '@/errors/tag-error-templates';
 import { TARGET_CONFIG } from '@/lib/utils/constants';
 import { Activity, AlertCircle, AlertOctagon, AlertTriangle, Droplet, Pill, Ruler, ShieldCheck, Weight } from 'lucide-react';
 import Link from 'next/link';
@@ -9,6 +7,7 @@ import { EmergencyContact } from '@/lib/types/emergency-contact';
 import HealthCard from '@/components/HealthCard';
 import EmergencyContactView from '@/components/EmergencyContactView';
 import { getBaseUrl } from '@/lib/utils/get-url';
+import tagUnavailable from '@/errors/tag-unavailable';
 
 const BASE_URL = getBaseUrl();
 
@@ -41,13 +40,17 @@ export default async function ViewerPage({ params }: ViewerProps) {
 
   if (!response.ok) {
     if (response.status === 403) {
-      return pendingTagActivation();
+      return tagUnavailable({ status: 'pending_activation' });
     }
 
-    return notFound();
+    return tagUnavailable({});
   }
 
   const { data } = await response.json();
+
+  if (['blocked', 'inactive'].includes(data.status)) {
+    return tagUnavailable({ status: data.status });
+  }
 
   const config = TARGET_CONFIG[data.target_type] || TARGET_CONFIG.other;
   const Icon = config.icon;

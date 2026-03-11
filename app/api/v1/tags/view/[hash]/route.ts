@@ -50,6 +50,7 @@ export async function GET(req: Request, { params }: { params: Promise<{ hash: st
       success: true,
       data: {
         ...tagData,
+        status: data.status,
         target_type: data.target_type,
         emergency_contacts: tagData.emergency_contacts || []
       }

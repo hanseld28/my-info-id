@@ -9,6 +9,7 @@ import {
 } from 'lucide-react';
 import { ForwardRefExoticComponent, RefAttributes } from 'react';
 import { ContactRelationship } from '../types/emergency-contact';
+import { StatusType } from '../types/tag';
 
 export const CURRENT_TERMS_VERSION = '1.0.0';
 
@@ -40,6 +41,14 @@ export const TARGET_TYPE_LABELS: Record<string, string> = {
 export const TARGET_TYPE_HUMAN_LIST = ['child', 'teen', 'adult', 'elderly', 'pcd']
 
 export const BLOOD_TYPE_HUMAN_LIST: string[] = ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'];
+
+export const TAG_STATUS_CONFIG: Record<StatusType, { label: string, color: string }> = {
+  generated: { label: TAG_STATUS_TYPE_MAP.generated, color: 'bg-blue-100 text-blue-700' },
+  pending_activation: { label: TAG_STATUS_TYPE_MAP.pending_activation, color: 'bg-amber-100 text-amber-700' },
+  active: { label: TAG_STATUS_TYPE_MAP.active, color: 'bg-emerald-100 text-emerald-700' },
+  blocked: { label: TAG_STATUS_TYPE_MAP.blocked, color: 'bg-red-100 text-red-700' },
+  inactive: { label: TAG_STATUS_TYPE_MAP.inactive, color: 'bg-slate-100 text-slate-700' }
+};
 
 export const TARGET_CONFIG: Record<string, { label: string, icon: ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>, color: string }> = {
   child: { label: 'Criança', icon: Baby, color: 'bg-cyan-100 text-cyan-600' },

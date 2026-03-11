@@ -4,6 +4,7 @@ import { Eye, EyeOff, Edit3, ExternalLink, Check, Copy, Lock, Unlock, Loader2, A
 import Link from 'next/link';
 import { toast } from 'sonner';
 import { useRouter } from 'next/navigation';
+import { StatusType } from '@/lib/types/tag';
 
 const REASON_OPTIONS = [
   { value: 'LOST', label: 'Perdi a tag' },
@@ -12,7 +13,13 @@ const REASON_OPTIONS = [
   { value: 'OTHER', label: 'Outro motivo' },
 ];
 
-export function TagActions({ tag }: { tag: { hash_url: string; security_code: string; status: string } }) {
+export function TagActions({
+  tag,
+  onStatusChange
+}: {
+  tag: { hash_url: string; security_code: string; status: string };
+  onStatusChange?: (newStatus: StatusType) => void;
+}) {
   const router = useRouter();
   
   const [showCode, setShowCode] = useState(false);
@@ -56,6 +63,11 @@ export function TagActions({ tag }: { tag: { hash_url: string; security_code: st
       if (!response.ok) throw new Error(data.error || 'Erro na requisição');
 
       setStatus(data.newStatus);
+
+      if (onStatusChange) {
+        onStatusChange(data.newStatus);
+      }
+
       toast.success(
         data.newStatus === 'blocked' 
           ? 'Tag bloqueada com sucesso.' 
@@ -65,7 +77,6 @@ export function TagActions({ tag }: { tag: { hash_url: string; security_code: st
       setShowModal(false);
       setJustification('');
       setReasonCode(REASON_OPTIONS[0].value);
-      router.refresh();
 
     } catch (error: unknown) {
       if (error instanceof Error) {
@@ -142,6 +153,7 @@ export function TagActions({ tag }: { tag: { hash_url: string; security_code: st
           <Link 
             href={`/${tag.hash_url}`} 
             title="Ver página pública"
+            target="_blank"
             className="p-2 text-slate-400 hover:text-blue-500 hover:bg-blue-50 rounded-full transition-all"
           >
             <ExternalLink size={18} />
