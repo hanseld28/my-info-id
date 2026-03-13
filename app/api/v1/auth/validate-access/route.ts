@@ -1,12 +1,19 @@
+import { getLogger } from '@/lib/log/logger';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 
-export async function POST(req: Request) {
+export async function POST(req: NextRequest) {
+  const logger = getLogger(req);
+
   const { email } = await req.json();
+
+  logger.info({ action: 'validate_access_attempt' }, 'Initializing request');
 
   const supabase = await createSupabaseServerClient();
 
-  const { data: authUsers, error: authError } = await supabase
+  logger.debug({ email }, 'Validating profile by e-mail');
+
+  const { data: authUser, error: authError } = await supabase
     .from('profiles')
     .select('id')
     .eq('email', email)
@@ -14,27 +21,35 @@ export async function POST(req: Request) {
     .maybeSingle();
 
   if (authError) {
-    console.error('Error fetching user profile:', authError);
+    logger.error({ err: authError }, 'Error fetching user profile');
     return NextResponse.json({ error: 'Erro ao verificar o usuário' }, { status: 500 });
   }
 
-  if (authUsers) {
+  if (authUser) {
+    logger.debug({ authUser }, 'Found user profile');
+
+    logger.info('Verifying linked tags on user');
+
     const { data: tag, error: tagError } = await supabase
       .from('tags')
       .select('id')
-      .eq('owner_id', authUsers.id)
+      .eq('owner_id', authUser.id)
       .limit(1)
       .maybeSingle();
 
     if (tagError) {
-      console.error('Error fetching user tag:', tagError);
+      logger.error({ err: tagError }, 'Error fetching associated user tag');
       return NextResponse.json({ error: 'Erro ao verificar produtos do usuário' }, { status: 500 });
     }
 
     if (tag) {
-      return NextResponse.json({ action: 'SEND_MAGIC_LINK' });
+      const action = 'SEND_MAGIC_LINK';
+      logger.info({ action, email }, 'Authorized to send magic link by e-mail');
+      return NextResponse.json({ action });
     }
   }
+
+  logger.info({ email }, 'No active products were found for provided email address.');
 
   return NextResponse.json({ 
     action: 'REQUIRE_SECURITY_CODE',

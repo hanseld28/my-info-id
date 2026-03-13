@@ -1,7 +1,8 @@
 import { generateHashURL, generateScanToken, generateSecurityCode } from '@/lib/utils/generator-utils';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
+import { NextRequest } from 'next/server';
 
-export async function POST(req: Request) {
+export async function POST(req: NextRequest) {
   const supabase = await createSupabaseServerClient();
 
   try {
