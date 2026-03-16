@@ -3,7 +3,6 @@ import { useState } from 'react';
 import { Eye, EyeOff, Edit3, ExternalLink, Check, Copy, Lock, Unlock, Loader2, AlertTriangle, ShieldCheck } from 'lucide-react';
 import Link from 'next/link';
 import { toast } from 'sonner';
-import { useRouter } from 'next/navigation';
 import { StatusType } from '@/lib/types/tag';
 
 const REASON_OPTIONS = [
@@ -20,7 +19,6 @@ export function TagActions({
   tag: { hash_url: string; security_code: string; status: string };
   onStatusChange?: (newStatus: StatusType) => void;
 }) {
-  const router = useRouter();
   
   const [showCode, setShowCode] = useState(false);
   const [copied, setCopied] = useState(false);
@@ -39,7 +37,7 @@ export function TagActions({
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch (err) {
-      console.error('Falha ao copiar:', err);
+      toast.error('Falha ao copiar: ' + (err instanceof Error ? err.message : 'erro desconhecido'));
     }
   };
 

@@ -1,12 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
+import { getLogger } from '@/lib/log/logger';
 
 export async function GET(request: NextRequest) {
-  const { searchParams } = new URL(request.url);
-  const hash = searchParams.get('hash');
-  const code = searchParams.get('code')?.toUpperCase();
+  const logger = getLogger(request);
+  
+  const hash = request.nextUrl.searchParams.get('hash');
+  const code = request.nextUrl.searchParams.get('code')?.toUpperCase();
 
   if (!hash || !code || code.length !== 6) {
+    logger.warn({ hash, code }, 'Invalid parameters provided');
+
     return NextResponse.json(
       { error: 'Dados insuficientes para verificação.' },
       { status: 400 }
@@ -14,6 +18,8 @@ export async function GET(request: NextRequest) {
   }
 
   const supabase = await createSupabaseServerClient();
+
+  logger.info({ hash, code }, 'Verifying tag for edit');
 
   const { data, error } = await supabase
     .from('tags')
@@ -47,6 +53,8 @@ export async function GET(request: NextRequest) {
     .maybeSingle();
 
   if (error || !data) {
+    logger.warn({ hash, code }, 'Tag not found or security code mismatch for verification');
+    
     return NextResponse.json(
       { error: 'Código de segurança incorreto para esta tag.' },
       { status: 401 }
@@ -54,11 +62,15 @@ export async function GET(request: NextRequest) {
   }
 
   if (data.status !== 'active') {
+    logger.warn({ hash, code }, 'Tag is not active for editing');
+    
     return NextResponse.json(
       { error: 'Esta tag ainda não foi ativada.' },
       { status: 403 }
     );
   }
+
+  logger.info({ tagId: data.id, hash }, 'Tag verified successfully for edit');
 
   return NextResponse.json({
     success: true,

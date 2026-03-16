@@ -1,13 +1,15 @@
+import { getLogger } from '@/lib/log/logger';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
 import { getBaseUrl } from '@/lib/utils/get-url';
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function POST (request: NextRequest) {
+  const logger = getLogger(request);
+
   try {
     const { email, token, securityCode, next, action } = await request.json();
 
-    console.log("Received magic link request for email:", email);
-    console.log("Received Turnstile token:", token);
+    logger.info({ email, token, securityCode, next, action }, 'Received magic link request');
     
     const response = NextResponse.json(
       { message: 'O link de acesso foi enviado com sucesso!' },
@@ -32,8 +34,8 @@ export async function POST (request: NextRequest) {
 
     const redirectTo = `${baseUrl}/api/v1/auth/callback?${params.toString()}`;
 
-    console.log("Constructed redirect URL for magic link:", redirectTo);
-    
+    logger.info({ redirectTo }, 'Constructed redirect URL for magic link');
+
     const { error } = await supabase.auth.signInWithOtp({
       email,
       options: {
@@ -42,7 +44,7 @@ export async function POST (request: NextRequest) {
     });    
 
     if (error) {
-      console.error('Error on sending magic link:', error);
+      logger.error({ err: error }, 'Error on sending magic link');
 
       if (error.status === 429) {
         return NextResponse.json(
@@ -56,12 +58,12 @@ export async function POST (request: NextRequest) {
         { status: error.status }
       );
     } else {
-      console.log('Magic link sent successfully to:', email);
+      logger.info({ email }, 'Magic link sent successfully');
       return response;
     }
   } catch (err) {
-    console.error('Unexpected error on magic link request:', err);
-    return NextResponse.json({ error: 'Unexpected error on magic link request' }, { status: 500 });
+    logger.error({ err }, 'Unexpected error on magic link request');
+    return NextResponse.json({ error: 'Erro interno do servidor.' }, { status: 500 });
   }
 
 }

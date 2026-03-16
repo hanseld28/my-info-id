@@ -1,10 +1,15 @@
+import { getLogger } from '@/lib/log/logger';
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function GET(req: NextRequest, { params }: { params: Promise<{ hash: string }> }) {
+  const logger = getLogger(req);
+
   const { hash } = await params;
 
   const supabase = await createSupabaseServerClient();
+  
+  logger.info({ hash }, 'Received request to view tag details');
 
   const { data, error } = await supabase
     .from('tags')
@@ -36,16 +41,21 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ hash
     .maybeSingle();
 
   if (error || !data) {
-    console.log(error)
+    logger.error({ hash }, 'Tag not found');
+
     return Response.json({ error: "Tag não encontrada" }, { status: 404 });
   }
 
   if (data.status === 'pending_activation') {
+    logger.warn({ hash }, 'Tag is pending activation');
+
     return Response.json({ error: "Tag ainda não foi ativada pelo proprietário" }, { status: 403 });
-  }
+  } 
 
   const [tagData] = data.tag_data;
   
+  logger.info({ tagData: JSON.stringify(tagData) }, 'Successfully retrieved tag details');
+
   return NextResponse.json({
       success: true,
       data: {

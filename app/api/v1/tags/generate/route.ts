@@ -1,12 +1,17 @@
 import { generateHashURL, generateScanToken, generateSecurityCode } from '@/lib/utils/generator-utils';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
 import { NextRequest } from 'next/server';
+import { getLogger } from '@/lib/log/logger';
 
 export async function POST(req: NextRequest) {
-  const supabase = await createSupabaseServerClient();
+  const logger = getLogger(req);
 
   try {
+    const supabase = await createSupabaseServerClient();
+    
     const { quantity } = await req.json();
+    
+    logger.info({ quantity }, 'Processing tag generation request');
     
     const { data: existingTags } = await supabase
       .from('tags')
@@ -38,19 +43,31 @@ export async function POST(req: NextRequest) {
           status: 'generated'
         });
         
+        logger.debug(
+          { scanToken, hash, secCode },
+          `Preparing new unique tag identifiers for insertion: ${newTags.length}/${quantity}`
+        );
+
         usedScanTokensInThisBatch.add(scanToken);
         usedHashesInThisBatch.add(hash);
         usedSecCodesInThisBatch.add(secCode);
       }
     }
 
+    logger.info({ count: newTags.length }, 'Generated unique identifiers for new tags, proceeding to insert into database');
+
     const { data, error } = await supabase
       .from('tags')
       .insert(newTags)
       .select();
 
-    if (error) throw error;
+    if (error) {
+      logger.error({ err: error }, 'Error inserting new tags into database');
+      throw error
+    };
     
+    logger.info({ insertedCount: data.length }, 'Successfully inserted new tags into database');
+
     return Response.json({ 
       success: true, 
       count: data.length,
@@ -59,6 +76,9 @@ export async function POST(req: NextRequest) {
 
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : 'An error occurred';
+    
+    logger.error({ err: error }, 'Error during tag generation process');
+
     return Response.json({ error: message }, { status: 500 });
   }
 }
