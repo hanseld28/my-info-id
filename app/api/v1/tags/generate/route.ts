@@ -1,5 +1,5 @@
 import { generateHashURL, generateScanToken, generateSecurityCode } from '@/lib/utils/generator-utils';
-import { createSupabaseServerClient } from '@/lib/supabase/server';
+import { createSupabaseServerClient } from '@/lib/database/supabase/server';
 import { NextRequest } from 'next/server';
 import { getLogger } from '@/lib/log/logger';
 

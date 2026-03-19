@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
-import { createSupabaseServerClient } from './lib/supabase/server';
+import { createSupabaseServerClient } from './lib/database/supabase/server';
 import { getLogger } from './lib/log/logger';
 import { headers } from 'next/headers';
 

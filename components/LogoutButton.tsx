@@ -1,6 +1,6 @@
 'use client';
 
-import { createSupabaseComponentClient } from '@/lib/supabase/client';
+import { createSupabaseComponentClient } from '@/lib/database/supabase/client';
 import { useRouter } from 'next/navigation';
 
 export default function LogoutButton() {

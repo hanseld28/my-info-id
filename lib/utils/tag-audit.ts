@@ -1,4 +1,4 @@
-import { createSupabaseServerClient } from '@/lib/supabase/server';
+import { createSupabaseServerClient } from '@/lib/database/supabase/server';
 import { AuditLogParams } from '../types/audit';
 import pino from 'pino';
 

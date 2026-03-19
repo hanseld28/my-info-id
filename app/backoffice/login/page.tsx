@@ -1,7 +1,7 @@
 'use client';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { createSupabaseComponentClient } from '@/lib/supabase/client';
+import { createSupabaseComponentClient } from '@/lib/database/supabase/client';
 import { toast } from 'sonner';
 
 export default function BackofficeLoginPage() {

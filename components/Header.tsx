@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import LogoutButton from './LogoutButton';
-import { createSupabaseServerClient } from '@/lib/supabase/server';
+import { createSupabaseServerClient } from '@/lib/database/supabase/server';
 import Image from 'next/image';
 import LoginButton from './LoginButton';
 

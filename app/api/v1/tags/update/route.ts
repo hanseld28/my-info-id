@@ -1,5 +1,5 @@
 import { getLogger } from '@/lib/log/logger';
-import { createSupabaseServerClient } from '@/lib/supabase/server';
+import { createSupabaseServerClient } from '@/lib/database/supabase/server';
 import { EmergencyContact } from '@/lib/types/emergency-contact';
 import { NextRequest, NextResponse } from 'next/server';
 
